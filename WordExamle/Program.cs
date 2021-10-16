@@ -53,6 +53,9 @@ namespace WordExamle
             TabTmp.Rows.Add(nrow);
             Table Tab = new Table("T", TabTmp);
             TabL.Add(Tab, true);
+
+            // Запускаем формирование отчёта
+            SrvStatic.StartCreateReport("", "", BmL, TabL);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace WordDotx.Lib
     /// <summary>
     /// Базовый класс для закладок
     /// </summary>
-    public abstract class BookmarkBase
+    public abstract class TotalBase
     {
         /// <summary>
         /// Индекс элемента в списке
@@ -19,19 +19,19 @@ namespace WordDotx.Lib
         public int Index { get; private set; }
 
         /// <summary>
-        /// Имя закладки которое нужно найти в файле шаблона
+        /// Имя тотала которое нужно найти в файле шаблона
         /// </summary>
-        public string BookmarkName { get; private set; }
+        public string TotalName { get; private set; }
 
         /// <summary>
         /// Конструктор
         /// </summary>
-        /// <param name="BookmarkName">Имя закладки</param>
-        public BookmarkBase(string BookmarkName)
+        /// <param name="TotalName">Имя тотала</param>
+        public TotalBase(string TotalName)
         {
             try
             {
-                this.BookmarkName = BookmarkName;
+                this.TotalName = TotalName;
             }
             catch (Exception ex)
             {
@@ -40,14 +40,14 @@ namespace WordDotx.Lib
         }
 
         /// <summary>
-        /// Базовый класс для компонента списка эелементов Bookmark
+        /// Базовый класс для компонента списка эелементов Total
         /// </summary>
-        public abstract class BookmarkListBase : IEnumerable
+        public abstract class TotalListBase : IEnumerable
         {
             /// <summary>
             /// Внутренний список 
             /// </summary>
-            private List<BookmarkBase> BkmL = new List<BookmarkBase>();
+            private List<TotalBase> TtlL = new List<TotalBase>();
 
             /// <summary>
             /// Количчество объектов в контейнере
@@ -59,9 +59,9 @@ namespace WordDotx.Lib
                     try
                     {
                         int rez;
-                        lock (BkmL)
+                        lock (TtlL)
                         {
-                            rez = BkmL.Count;
+                            rez = TtlL.Count;
                         }
                         return rez;
                     }
@@ -76,34 +76,34 @@ namespace WordDotx.Lib
             /// <summary>
             /// Добавление нового элемента
             /// </summary>
-            /// <param name="newBkm">Элемент который нужно добавить в список</param>
+            /// <param name="newTtl">Элемент который нужно добавить в список</param>
             /// <param name="HashExeption">C отображением исключений</param>
             /// <returns>Результат операции (Успех или нет)</returns>
-            public bool Add(BookmarkBase newBkm, bool HashExeption)
+            public bool Add(TotalBase newTtl, bool HashExeption)
             {
                 bool rez = false;
 
                 try
                 {
-                    lock (this.BkmL)
+                    lock (this.TtlL)
                     {
                         // Проверка на наличие этого элемента в списке
-                        foreach (BookmarkBase item in this.BkmL)
+                        foreach (TotalBase item in this.TtlL)
                         {
-                            if (item.BookmarkName == newBkm.BookmarkName)
+                            if (item.TotalName == newTtl.TotalName)
                             {
-                                throw new ApplicationException(string.Format("Элемент с таким именем: {0} уже существует в списке.", newBkm.BookmarkName));
+                                throw new ApplicationException(string.Format("Элемент с таким именем: {0} уже существует в списке.", newTtl.TotalName));
                             }
                         }
 
-                        newBkm.Index = BkmL.Count;
-                        this.BkmL.Add(newBkm);
+                        newTtl.Index = TtlL.Count;
+                        this.TtlL.Add(newTtl);
                         rez = true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    if(HashExeption) throw new ApplicationException(string.Format("{0}.Add   Упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
+                    if (HashExeption) throw new ApplicationException(string.Format("{0}.Add   Упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
                 }
                 return rez;
             }
@@ -111,22 +111,22 @@ namespace WordDotx.Lib
             /// <summary>
             /// Удаление элемента
             /// </summary>
-            /// <param name="delBkm">Элемент который нужно удалить из списка</param>
+            /// <param name="delTtl">Элемент который нужно удалить из списка</param>
             /// <param name="HashExeption">C отображением исключений</param>
             /// <returns>Результат операции (Успех или нет)</returns>
-            public bool Remove(BookmarkBase delBkm, bool HashExeption)
+            public bool Remove(TotalBase delTtl, bool HashExeption)
             {
                 bool rez = false;
                 try
                 {
-                    lock (this.BkmL)
+                    lock (this.TtlL)
                     {
-                        int delIndex = delBkm.Index;
-                        this.BkmL.RemoveAt(delIndex);
+                        int delIndex = delTtl.Index;
+                        this.TtlL.RemoveAt(delIndex);
 
-                        for (int i = delIndex; i < this.BkmL.Count; i++)
+                        for (int i = delIndex; i < this.TtlL.Count; i++)
                         {
-                            this.BkmL[i].Index = i;
+                            this.TtlL[i].Index = i;
                         }
 
                         rez = true;
@@ -134,7 +134,7 @@ namespace WordDotx.Lib
                 }
                 catch (Exception ex)
                 {
-                    if (HashExeption) throw new ApplicationException(string.Format("Не удалось удалить элемент с именем {0} из списка. Произошла ошибка: {1}", delBkm.BookmarkName, ex.Message));
+                    if (HashExeption) throw new ApplicationException(string.Format("Не удалось удалить элемент с именем {0} из списка. Произошла ошибка: {1}", delTtl.TotalName, ex.Message));
                 }
 
                 return rez;
@@ -144,25 +144,25 @@ namespace WordDotx.Lib
             /// Обновление данных элемента конфигурации.
             /// </summary>
             /// <param name="IndexId">Индекс элемента который нужно обновить</param>
-            /// <param name="updBkm">Пользователь у которого нужно изменить данные</param>
+            /// <param name="updTtl">Пользователь у которого нужно изменить данные</param>
             /// <param name="HashExeption">C отображением исключений</param>
             /// <returns>Результат операции (Успех или нет)</returns>
-            public bool Update(int IndexId, BookmarkBase updBkm, bool HashExeption)
+            public bool Update(int IndexId, TotalBase updTtl, bool HashExeption)
             {
                 bool rez = false;
                 try
                 {
-                    lock (this.BkmL)
+                    lock (this.TtlL)
                     {
 
-                        if (IndexId >= this.BkmL.Count)
+                        if (IndexId >= this.TtlL.Count)
                         {
-                            if (HashExeption) throw new ApplicationException(string.Format("Не удалось обновить данные элемента в списке {0}. Элемента с таким индексом {1} не существует.", updBkm.BookmarkName, updBkm.ToString()));
+                            if (HashExeption) throw new ApplicationException(string.Format("Не удалось обновить данные элемента в списке {0}. Элемента с таким индексом {1} не существует.", updTtl.TotalName, updTtl.ToString()));
                         }
                         else
                         {
-                            updBkm.Index = IndexId;
-                            this.BkmL[IndexId] = updBkm;
+                            updTtl.Index = IndexId;
+                            this.TtlL[IndexId] = updTtl;
 
                             rez = true;
                         }
@@ -170,7 +170,7 @@ namespace WordDotx.Lib
                 }
                 catch (Exception ex)
                 {
-                    if (HashExeption) throw new ApplicationException(string.Format("Не удалось обновить данные элемента в списке {0}. Произошла ошибка: {1}", updBkm.BookmarkName, ex.Message));
+                    if (HashExeption) throw new ApplicationException(string.Format("Не удалось обновить данные элемента в списке {0}. Произошла ошибка: {1}", updTtl.TotalName, ex.Message));
                 }
 
                 return rez;
@@ -181,14 +181,14 @@ namespace WordDotx.Lib
             /// </summary>
             /// <param name="i">Введите идентификатор</param>
             /// <returns></returns>
-            public BookmarkBase getBookmarkComponent(int i)
+            public TotalBase getTotalComponent(int i)
             {
                 try
                 {
-                    BookmarkBase rez = null;
-                    lock (BkmL)
+                    TotalBase rez = null;
+                    lock (TtlL)
                     {
-                        rez = this.BkmL[i];
+                        rez = this.TtlL[i];
                     }
 
                     if (rez == null) throw new ApplicationException(String.Format("Объект с индексом {0} не найден.", i));
@@ -206,16 +206,16 @@ namespace WordDotx.Lib
             /// </summary>
             /// <param name="s">Введите имя закладки</param>
             /// <returns></returns>
-            public BookmarkBase getBookmarkComponent(string s)
+            public TotalBase getTotalComponent(string s)
             {
                 try
                 {
-                    BookmarkBase rez = null;
-                    lock (BkmL)
+                    TotalBase rez = null;
+                    lock (TtlL)
                     {
-                        foreach (BookmarkBase item in this.BkmL)
+                        foreach (TotalBase item in this.TtlL)
                         {
-                            if (item.BookmarkName == s)
+                            if (item.TotalName == s)
                             {
                                 rez = item;
                                 break;
@@ -223,7 +223,7 @@ namespace WordDotx.Lib
                         }
                     }
 
-                    if (rez==null) throw new ApplicationException(String.Format("Объект с именем {0} не найден.", s));
+                    if (rez == null) throw new ApplicationException(String.Format("Объект с именем {0} не найден.", s));
 
                     return rez;
                 }
@@ -240,9 +240,9 @@ namespace WordDotx.Lib
             public IEnumerator GetEnumerator()
             {
                 IEnumerator rez = null;
-                lock (BkmL)
+                lock (TtlL)
                 {
-                    rez = this.BkmL.GetEnumerator();
+                    rez = this.TtlL.GetEnumerator();
                 }
                 return rez;
             }

@@ -49,9 +49,12 @@
     <Compile Include="FarmWordDotx.cs" />
     <Compile Include="Lib\BookmarkBase.cs" />
     <Compile Include="Lib\TableBase.cs" />
+    <Compile Include="Lib\TotalBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableList.cs" />
+    <Compile Include="Total.cs" />
+    <Compile Include="TotalList.cs" />
     <Compile Include="WordDotxServer.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,11 @@ namespace WordDotx
         public DataTable TableValue;
 
         /// <summary>
+        /// Список тоталов которые нужно найти и заменить в шаблоне
+        /// </summary>
+        public TotalList TtlList;
+
+        /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="TableName">Имя таблицы с которой работаем</param>
@@ -28,6 +33,7 @@ namespace WordDotx
             try
             {
                 this.TableValue = TableValue;
+                this.TtlList = new TotalList();
             }
             catch (Exception ex)
             {
