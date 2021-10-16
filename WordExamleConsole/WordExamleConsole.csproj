@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C6D7A928-2FD7-45B8-9D1C-5A43A163CE9F}</ProjectGuid>
+    <ProjectGuid>{9EDA32AE-EE2A-4742-AFBC-A29077826FB9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WordExamle</RootNamespace>
-    <AssemblyName>WordExamle</AssemblyName>
+    <RootNamespace>WordExamleConsole</RootNamespace>
+    <AssemblyName>WordExamleConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WordDotx\WordDotx.csproj">
-      <Project>{7025fcda-f9e6-4385-b9b4-a507dacb0697}</Project>
-      <Name>WordDotx</Name>
+    <ProjectReference Include="..\WordExamle\WordExamle.csproj">
+      <Project>{c6d7a928-2fd7-45b8-9d1c-5a43a163ce9f}</Project>
+      <Name>WordExamle</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
