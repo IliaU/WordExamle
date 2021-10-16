@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Word = Microsoft.Office.Interop.Word;
+using System.IO;
 
 namespace WordDotx
 {
@@ -27,7 +28,7 @@ namespace WordDotx
         /// Папка по умолчанию для нашего файла в который положим результат
         /// </summary>
         public string DefaultPathTarget;
-
+        
         /// <summary>
         /// Конструктор для создания сервера
         /// </summary>
@@ -88,75 +89,90 @@ namespace WordDotx
         /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
         /// <param name="BkmrkL">Список закладок которые мы будем использовать</param>
         /// <param name="TblL">Список таблиц который будем использовать</param>
-        public void StartCreateReport(string Source, string Target, BookmarkList BkmrkL, TableList TblL)
+        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
+        public void StartCreateReport(string Source, string Target, BookmarkList BkmrkL, TableList TblL, bool ReplaseFileTarget)
         {
             try
             {
-                // открываем приложение ворда
-                Word._Application application = new Word.Application();
-                Word._Document document = null;
-                // создаём переменные
-                Object missingObj = System.Reflection.Missing.Value;
-                Object trueObj = true;
-                Object falseObj = false;
-                Object templatePathObj = (Source.IndexOf(@"\") > 0 ? Source : string.Format(@"{0}\{1}", this.DefaultPathSource, Source));
-                Object pathToSaveObj = (Target.IndexOf(@"\") > 0 ? Source : string.Format(@"{0}\{1}", this.DefaultPathTarget, Target));
-
-                try
+                // Процесс должен идти в один поток скорее всего работать в несколько может не получиться
+                lock (obj)
                 {
-                    // Добавляем в приложение сам документ  обрати внимание что может быть несколько документов добавлено а потом в самом концеможно из сделать видимыми
-                    document = application.Documents.Add(ref templatePathObj, ref missingObj, ref missingObj, ref missingObj);
-                    //document = application.Documents.Add(ref templatePathObj1, ref missingObj, ref missingObj, ref missingObj);
 
-                    // Находим все закладки и меняем в них значения
-                    foreach (Bookmark item in BkmrkL)
-                    {
-                        document.Bookmarks[item.BookmarkName].Range.Text = item.BookmarkValue;
-                    }
+                    // создаём переменные
+                    Object missingObj = System.Reflection.Missing.Value;
+                    Object trueObj = true;
+                    Object falseObj = false;
+                    Object templatePathObj = (Source.IndexOf(@"\") > 0 ? Source : string.Format(@"{0}\{1}", this.DefaultPathSource, Source));
+                    Object pathToSaveObj = (Target.IndexOf(@"\") > 0 ? Source : string.Format(@"{0}\{1}", this.DefaultPathTarget, Target));
 
-                    // Которые нам передали
-                    foreach (Table item in TblL)
-                    {
-                        // Пробегаем по таблицам в корне
-                        foreach (Word.Table itemT in document.Tables)
-                        {
-                            // Вызываем процесс обработки таблиц
-                            ProcessTable(item, itemT);
-                        }
-                    }
+                    // Проверка путей
+                    if (templatePathObj==null || string.IsNullOrWhiteSpace(templatePathObj.ToString())) throw new ApplicationException(string.Format("Не указан файл шаблона"));
+                    if (!File.Exists(templatePathObj.ToString())) throw new ApplicationException(string.Format("Шаблон не найден по пути: ({0})", templatePathObj.ToString()));
+                    if (pathToSaveObj==null || string.IsNullOrWhiteSpace(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("Не указан файл relf куда сохранить результат."));
+                    string DirTmp = Path.GetDirectoryName(pathToSaveObj.ToString());
+                    if (!Directory.Exists(DirTmp)) throw new ApplicationException(string.Format("Целевой директории в которой должен лежать файл не существует: ({0})", templatePathObj));
+                    if (!ReplaseFileTarget && File.Exists(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("В Целевой папке уже существует файл с таким именем: ({0})", pathToSaveObj.ToString()));
 
-                    // Сохраняем но как вордовский докумен
-                    document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument);
+                    // открываем приложение ворда
+                    Word._Application application = new Word.Application();
+                    Word._Document document = null;
 
-                    // Делаем видимыми все документы в этом приложении
-                    //application.Visible = true;
-
-                }
-                catch (Exception ex)
-                {
-                    if (document != null)
-                    {
-                        document.Close(ref falseObj, ref missingObj, ref missingObj);
-                        application.Quit(ref missingObj, ref missingObj, ref missingObj);
-                    }
-                    //throw ex;
-                }
-                finally
-                {
                     try
+                    {
+                        // Добавляем в приложение сам документ  обрати внимание что может быть несколько документов добавлено а потом в самом концеможно из сделать видимыми
+                        document = application.Documents.Add(ref templatePathObj, ref missingObj, ref missingObj, ref missingObj);
+                        //document = application.Documents.Add(ref templatePathObj1, ref missingObj, ref missingObj, ref missingObj);
+
+                        // Находим все закладки и меняем в них значения
+                        foreach (Bookmark item in BkmrkL)
+                        {
+                            document.Bookmarks[item.BookmarkName].Range.Text = item.BookmarkValue;
+                        }
+
+                        // Которые нам передали
+                        foreach (Table item in TblL)
+                        {
+                            // Пробегаем по таблицам в корне
+                            foreach (Word.Table itemT in document.Tables)
+                            {
+                                // Вызываем процесс обработки таблиц
+                                ProcessTable(item, itemT);
+                            }
+                        }
+
+                        // Сохраняем но как вордовский докумен
+                        document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument);
+
+                        // Делаем видимыми все документы в этом приложении
+                        //application.Visible = true;
+
+                    }
+                    catch (Exception ex)
                     {
                         if (document != null)
                         {
-                            document.Close();
-                            document = null;
+                            document.Close(ref falseObj, ref missingObj, ref missingObj);
+                            application.Quit(ref missingObj, ref missingObj, ref missingObj);
                         }
-                        if (application != null)
-                        {
-                            application.Quit();
-                            application = null;
-                        }
+                        //throw ex;
                     }
-                    catch (Exception) { }
+                    finally
+                    {
+                        try
+                        {
+                            if (document != null)
+                            {
+                                document.Close();
+                                document = null;
+                            }
+                            if (application != null)
+                            {
+                                application.Quit();
+                                application = null;
+                            }
+                        }
+                        catch (Exception) { }
+                    }
                 }
 
             }
@@ -173,7 +189,8 @@ namespace WordDotx
         /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
         /// <param name="Bkmrk">Закладока которые мы будем использовать</param>
         /// <param name="Tbl">Таблица который будем использовать</param>
-        public void StartCreateReport(string Source, string Target, Bookmark Bkmrk, Table Tbl)
+        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
+        public void StartCreateReport(string Source, string Target, Bookmark Bkmrk, Table Tbl, bool ReplaseFileTarget)
         {
             try
             {
@@ -183,7 +200,7 @@ namespace WordDotx
                 TableList TblL = new TableList();
                 TblL.Add(Tbl, true);
 
-                StartCreateReport(Source, Target, BkmrkL, TblL);
+                StartCreateReport(Source, Target, BkmrkL, TblL, ReplaseFileTarget);
             }
             catch (Exception ex)
             {
@@ -198,14 +215,15 @@ namespace WordDotx
         /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
         /// <param name="BkmrkL">Закладока которые мы будем использовать</param>
         /// <param name="Tbl">Таблица который будем использовать</param>
-        public void StartCreateReport(string Source, string Target, BookmarkList BkmrkL, Table Tbl)
+        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
+        public void StartCreateReport(string Source, string Target, BookmarkList BkmrkL, Table Tbl, bool ReplaseFileTarget)
         {
             try
             {
                 TableList TblL = new TableList();
                 TblL.Add(Tbl, true);
 
-                StartCreateReport(Source, Target, BkmrkL, TblL);
+                StartCreateReport(Source, Target, BkmrkL, TblL, ReplaseFileTarget);
             }
             catch (Exception ex)
             {
@@ -220,14 +238,15 @@ namespace WordDotx
         /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
         /// <param name="Bkmrk">Закладока которые мы будем использовать</param>
         /// <param name="TblL">Таблица который будем использовать</param>
-        public void StartCreateReport(string Source, string Target, Bookmark Bkmrk, TableList TblL)
+        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
+        public void StartCreateReport(string Source, string Target, Bookmark Bkmrk, TableList TblL, bool ReplaseFileTarget)
         {
             try
             {
                 BookmarkList BkmrkL = new BookmarkList();
                 BkmrkL.Add(Bkmrk, true);
 
-                StartCreateReport(Source, Target, BkmrkL, TblL);
+                StartCreateReport(Source, Target, BkmrkL, TblL, ReplaseFileTarget);
             }
             catch (Exception ex)
             {
