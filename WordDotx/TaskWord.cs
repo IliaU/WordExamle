@@ -132,6 +132,25 @@ namespace WordDotx
         }
         //
         /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="Source">Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
+        /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
+        /// <param name="BkmrkL">Список закладок которые мы будем использовать</param>
+        /// <param name="TblL">Список таблиц который будем использовать</param>
+        public TaskWord(string Source, string Target, BookmarkList BkmrkL, TableList TblL) : this(Source, Target, BkmrkL, TblL, null)
+        {
+            try
+            {
+                
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
+            }
+        }
+        //
+        /// <summary>
         /// Процесс создания отчёта с подменой в шаблоне необходимых элементов на наши закладки и таблицы
         /// </summary>
         /// <param name="Source">Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
