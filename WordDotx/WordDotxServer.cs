@@ -183,7 +183,7 @@ namespace WordDotx
                             document.Close(ref falseObj, ref missingObj, ref missingObj);
                             application.Quit(ref missingObj, ref missingObj, ref missingObj);
                         }
-                        //throw ex;
+                        throw ex;
                     }
                     finally
                     {
