@@ -55,6 +55,27 @@ namespace WordDotx
             private set { }
         }
 
+
+        /// <summary>
+        /// Создание сервера который будет обрабатывать наши объекты ворда в эдиничном экземпляре
+        /// </summary>
+        /// <param name="DefaultPathSource">Папка по умолчанию для нашего файла с источником шаблонов</param>
+        /// <param name="DefaultPathTarget">Папка по умолчанию для нашего файла в который положим результат</param>
+        /// <param name="DefReplaseFileTarget">Поведение по умолчанию нужно заменить файл или нет</param>
+        /// <returns>Возвращет наш сервер который будет обрабатывать отчёты</returns>
+        public static WordDotxServer CreateWordDotxServer(string DefaultPathSource, string DefaultPathTarget, bool DefReplaseFileTarget)
+        {
+            try
+            {
+                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, DefReplaseFileTarget);
+                return _CurrentWordDotxServer;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(string.Format("{0}.FarmWordDotx   Упали с ошибкой при создании сервера: ({1})", "FarmWordDotx", ex.Message));
+            }
+        }
+
         /// <summary>
         /// Создание сервера который будет обрабатывать наши объекты ворда в эдиничном экземпляре
         /// </summary>
