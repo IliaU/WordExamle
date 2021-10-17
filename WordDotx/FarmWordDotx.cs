@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.Office.Interop.Word;
+using System.Reflection;
 
 namespace WordDotx
 {
@@ -31,6 +31,31 @@ namespace WordDotx
         }
 
         /// <summary>
+        /// Получаем версию нашего приложения в дальнейшем если будут меняться классы  и отражают следующие изменения
+        ///    значение с индексом  0 меняют интерфейсы пользователя старые версии могут не работать совсем
+        ///    значение с индексом  1 добовляется функционал но это новый функционал и на пользователя вообще не влияет 
+        ///    значение с индексом  2 изменяется текущий функционал но для пользователя изменений нет
+        ///    значение с индексом  3 если изменения структуры вообще не меняются а только правится ошибка
+        /// </summary>
+        public static int[] VersionDll
+        {
+            get
+            {
+                int[] rez = { 1, 0, 0, 1 };
+                string ss = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                string[] tmp = ss.Split('.');
+
+                for (int i = 0; i < rez.Length; i++)
+                {
+                    rez[i] = int.Parse(tmp[i]);
+                }
+
+                return rez;
+            }
+            private set { }
+        }
+
+        /// <summary>
         /// Создание сервера который будет обрабатывать наши объекты ворда в эдиничном экземпляре
         /// </summary>
         /// <param name="DefaultPathSource">Папка по умолчанию для нашего файла с источником шаблонов</param>
@@ -40,7 +65,7 @@ namespace WordDotx
         {
             try
             {
-                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget);
+                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, true);
                 return _CurrentWordDotxServer;
             }
             catch (Exception ex)

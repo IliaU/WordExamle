@@ -15,6 +15,9 @@ namespace WordExamle
         {
             try
             {
+                // Можно смотреть версию приложения и понимать нужно ли попросить обновиться пользователя или нет
+                int[] ver = FarmWordDotx.VersionDll;
+
                 // Хотим создавать статичный класс которы будет обрабатывать наши объекты
                 // Метод имее перегрузку можно указать входную и выходную папку по умолчанию где берём шаблоны для обработки и куда клоадём результат
                 WordDotxServer SrvStatic = FarmWordDotx.CreateWordDotxServer();
@@ -57,13 +60,16 @@ namespace WordExamle
                 TabL.Add(Tab, true);
 
                 // Добавляем тоталов в нашу таблицу
-                Tab.TtlList.Add(new Total("Total0", "Итог по Total0"), false);
-                Tab.TtlList.Add(new Total("Total1", "Итог по Total1"), false);
-                Tab.TtlList.Add(new Total("Total2", "Итог по Total2"), false);
-                Tab.TtlList.Add(new Total("Total3", "Итог по Total3"), false);
+                Tab.TtlList.Add(new Total("Total0", "Итог по Total0---"), false);
+                Tab.TtlList.Add(new Total("Total1", "Итог по Total1---"), false);
+                Tab.TtlList.Add(new Total("Total2", "Итог по Total2---"), false);
+                Tab.TtlList.Add(new Total("Total3", "Итог по Total3---"), false);
+
+                // Создаём задание
+                TaskWord Tsk = new TaskWord(Environment.CurrentDirectory.Replace(@"WordExamle\bin\Debug", @"Шаблон.dotx"), Environment.CurrentDirectory.Replace(@"WordExamle\bin\Debug", @"Результат.doc"), BmL, TabL, true);
 
                 // Запускаем формирование отчёта
-                SrvStatic.StartCreateReport(Environment.CurrentDirectory +@"\Шаблон.dotx", Environment.CurrentDirectory + @"\Результат.doс", BmL, TabL, true);
+                SrvStatic.StartCreateReport(Tsk);
 
                 
 
@@ -74,7 +80,7 @@ namespace WordExamle
                 Console.WriteLine(string.Format("ERROR: {0}", ex.Message));
             }
 
-            Console.ReadLine();
+            //Console.ReadLine();
         }
     }
 }

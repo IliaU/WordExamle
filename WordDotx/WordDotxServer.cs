@@ -28,13 +28,19 @@ namespace WordDotx
         /// Папка по умолчанию для нашего файла в который положим результат
         /// </summary>
         public string DefaultPathTarget;
-        
+
+        /// <summary>
+        /// Поведение по умолчанию нужно заменить файл или нет
+        /// </summary>
+        public bool DefReplaseFileTarget;
+
         /// <summary>
         /// Конструктор для создания сервера
         /// </summary>
         /// <param name="DefaultPathSource">Папка по умолчанию для нашего файла с источником шаблонов</param>
         /// <param name="DefaultPathTarget">Папка по умолчанию для нашего файла в который положим результат</param>
-        public WordDotxServer(string DefaultPathSource, string DefaultPathTarget)
+        /// <param name="DefReplaseFileTarget">Папка по умолчанию для нашего файла в который положим результат</param>
+        public WordDotxServer(string DefaultPathSource, string DefaultPathTarget, bool DefReplaseFileTarget)
         {
             try
             {
@@ -42,6 +48,7 @@ namespace WordDotx
                 {
                     this.DefaultPathSource = DefaultPathSource;
                     this.DefaultPathTarget = DefaultPathTarget;
+                    this.DefReplaseFileTarget = DefReplaseFileTarget;
                     obj = this;
                 }
             }
@@ -54,8 +61,9 @@ namespace WordDotx
         /// <summary>
         /// Конструктор для создания сервера
         /// </summary>
-        /// <param name="DefPathSorsAndTarget">Если путь один и для входящих файлов и исходящих</param>
-        public WordDotxServer(string DefPathSorsAndTarget) : this(DefPathSorsAndTarget, DefPathSorsAndTarget)
+        /// <param name="DefaultPathSource">Папка по умолчанию для нашего файла с источником шаблонов</param>
+        /// <param name="DefaultPathTarget">Папка по умолчанию для нашего файла в который положим результат</param>
+        public WordDotxServer(string DefaultPathSource, string DefaultPathTarget) : this(DefaultPathSource, DefaultPathTarget, true)
         {
             try
             {
@@ -70,7 +78,23 @@ namespace WordDotx
         /// <summary>
         /// Конструктор для создания сервера
         /// </summary>
-        public WordDotxServer() : this(Environment.CurrentDirectory, Environment.CurrentDirectory)
+        /// <param name="DefPathSorsAndTarget">Если путь один и для входящих файлов и исходящих</param>
+        public WordDotxServer(string DefPathSorsAndTarget) : this(DefPathSorsAndTarget, DefPathSorsAndTarget, true)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(string.Format("{0}   Упали с ошибкой в конструкторе: ({1})", obj.GetType().Name, ex.Message));
+            }
+        }
+        //
+        /// <summary>
+        /// Конструктор для создания сервера
+        /// </summary>
+        public WordDotxServer() : this(Environment.CurrentDirectory, Environment.CurrentDirectory, true)
         {
             try
             {
@@ -85,25 +109,23 @@ namespace WordDotx
         /// <summary>
         /// Процесс создания отчёта с подменой в шаблоне необходимых элементов на наши закладки и таблицы
         /// </summary>
-        /// <param name="Source">Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="BkmrkL">Список закладок которые мы будем использовать</param>
-        /// <param name="TblL">Список таблиц который будем использовать</param>
-        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
-        public void StartCreateReport(string Source, string Target, BookmarkList BkmrkL, TableList TblL, bool ReplaseFileTarget)
+        /// <param name="Tsk">Задание которое нужно выполнить</param>
+        public void StartCreateReport(TaskWord Tsk)
         {
             try
             {
+                bool TmpReplaseFileTarget = this.DefReplaseFileTarget;
+                if (Tsk.ReplaseFileTarget != null) TmpReplaseFileTarget = (bool)Tsk.ReplaseFileTarget;
+
                 // Процесс должен идти в один поток скорее всего работать в несколько может не получиться
                 lock (obj)
                 {
-
                     // создаём переменные
                     Object missingObj = System.Reflection.Missing.Value;
                     Object trueObj = true;
                     Object falseObj = false;
-                    Object templatePathObj = (Source.IndexOf(@"\") > 0 ? Source : string.Format(@"{0}\{1}", this.DefaultPathSource, Source));
-                    Object pathToSaveObj = (Target.IndexOf(@"\") > 0 ? Source : string.Format(@"{0}\{1}", this.DefaultPathTarget, Target));
+                    Object templatePathObj = (Tsk.Source.IndexOf(@"\") > 0 ? Tsk.Source : string.Format(@"{0}\{1}", this.DefaultPathSource, Tsk.Source));
+                    Object pathToSaveObj = (Tsk.Target.IndexOf(@"\") > 0 ? Tsk.Target : string.Format(@"{0}\{1}", this.DefaultPathTarget, Tsk.Target));
 
                     // Проверка путей
                     if (templatePathObj==null || string.IsNullOrWhiteSpace(templatePathObj.ToString())) throw new ApplicationException(string.Format("Не указан файл шаблона"));
@@ -111,7 +133,7 @@ namespace WordDotx
                     if (pathToSaveObj==null || string.IsNullOrWhiteSpace(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("Не указан файл relf куда сохранить результат."));
                     string DirTmp = Path.GetDirectoryName(pathToSaveObj.ToString());
                     if (!Directory.Exists(DirTmp)) throw new ApplicationException(string.Format("Целевой директории в которой должен лежать файл не существует: ({0})", templatePathObj));
-                    if (!ReplaseFileTarget && File.Exists(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("В Целевой папке уже существует файл с таким именем: ({0})", pathToSaveObj.ToString()));
+                    if (!TmpReplaseFileTarget && File.Exists(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("В Целевой папке уже существует файл с таким именем: ({0})", pathToSaveObj.ToString()));
 
                     // открываем приложение ворда
                     Word._Application application = new Word.Application();
@@ -124,13 +146,20 @@ namespace WordDotx
                         //document = application.Documents.Add(ref templatePathObj1, ref missingObj, ref missingObj, ref missingObj);
 
                         // Находим все закладки и меняем в них значения
-                        foreach (Bookmark item in BkmrkL)
+                        foreach (Bookmark item in Tsk.BkmrkL)
                         {
-                            document.Bookmarks[item.BookmarkName].Range.Text = item.BookmarkValue;
+                            try
+                            {
+                                document.Bookmarks[item.BookmarkName].Range.Text = item.BookmarkValue;
+                            }
+                            catch (Exception ex)
+                            {
+                                // throw;Тут надо прикрутить событие варнинг типо не используется в этом файле такая закладка не найдена
+                            }
                         }
 
                         // Которые нам передали
-                        foreach (Table item in TblL)
+                        foreach (Table item in Tsk.TblL)
                         {
                             // Пробегаем по таблицам в корне
                             foreach (Word.Table itemT in document.Tables)
@@ -175,78 +204,6 @@ namespace WordDotx
                     }
                 }
 
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
-            }
-        }
-
-        /// <summary>
-        /// Процесс создания отчёта с подменой в шаблоне необходимых элементов на наши закладки и таблицы
-        /// </summary>
-        /// <param name="Source">Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="Bkmrk">Закладока которые мы будем использовать</param>
-        /// <param name="Tbl">Таблица который будем использовать</param>
-        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
-        public void StartCreateReport(string Source, string Target, Bookmark Bkmrk, Table Tbl, bool ReplaseFileTarget)
-        {
-            try
-            {
-                BookmarkList BkmrkL = new BookmarkList();
-                BkmrkL.Add(Bkmrk, true);
-
-                TableList TblL = new TableList();
-                TblL.Add(Tbl, true);
-
-                StartCreateReport(Source, Target, BkmrkL, TblL, ReplaseFileTarget);
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
-            }
-        }
-        //
-        /// <summary>
-        /// Процесс создания отчёта с подменой в шаблоне необходимых элементов на наши закладки и таблицы
-        /// </summary>
-        /// <param name="Source">Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="BkmrkL">Закладока которые мы будем использовать</param>
-        /// <param name="Tbl">Таблица который будем использовать</param>
-        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
-        public void StartCreateReport(string Source, string Target, BookmarkList BkmrkL, Table Tbl, bool ReplaseFileTarget)
-        {
-            try
-            {
-                TableList TblL = new TableList();
-                TblL.Add(Tbl, true);
-
-                StartCreateReport(Source, Target, BkmrkL, TblL, ReplaseFileTarget);
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
-            }
-        }
-        //
-        /// <summary>
-        /// Процесс создания отчёта с подменой в шаблоне необходимых элементов на наши закладки и таблицы
-        /// </summary>
-        /// <param name="Source">Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="Target">Путь к файлу отчёта который создать по окончании работы или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса</param>
-        /// <param name="Bkmrk">Закладока которые мы будем использовать</param>
-        /// <param name="TblL">Таблица который будем использовать</param>
-        /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
-        public void StartCreateReport(string Source, string Target, Bookmark Bkmrk, TableList TblL, bool ReplaseFileTarget)
-        {
-            try
-            {
-                BookmarkList BkmrkL = new BookmarkList();
-                BkmrkL.Add(Bkmrk, true);
-
-                StartCreateReport(Source, Target, BkmrkL, TblL, ReplaseFileTarget);
             }
             catch (Exception ex)
             {
@@ -301,23 +258,61 @@ namespace WordDotx
                         //Если найден объект который потенциально может быть в нашем датасете
                         if (tmpCell.IndexOf("{@D") > -1)
                         {
-                            FlagAddRow = tmpCell.Substring(tmpCell.IndexOf("{@D"), tmpCell.IndexOf(".", tmpCell.IndexOf("{@D")) - tmpCell.IndexOf("{@D"));
+                            // Получаем флаг
+                            string TmpFlagAddRow = tmpCell.Substring(tmpCell.IndexOf("{@D"), tmpCell.IndexOf(".", tmpCell.IndexOf("{@D")) - tmpCell.IndexOf("{@D"));
 
-                            // тогда нужно выбрать какой подиток вывести
-                            if (tmpCell.IndexOf(FlagAddRow + ".T") > -1)
-                            {
-                                // Вырезаем имя тотала
-                                string TmpTotalColumn = tmpCell.Substring(tmpCell.IndexOf(FlagAddRow + ".T") + FlagAddRow.Length + 2, tmpCell.IndexOf("}", tmpCell.IndexOf("}")) - tmpCell.IndexOf(FlagAddRow + ".T") - +FlagAddRow.Length - 2);
+                            // Получаем имя таблицы и проверяем что она соответствует той что мы сейчас смотрим
+                            string TmpTableName = TmpFlagAddRow.Substring(tmpCell.IndexOf("D") + 1, TmpFlagAddRow.Length - tmpCell.IndexOf("D") - 1);
+                            int TmpTableIndex = -1;
+                            try { TmpTableIndex = int.Parse(TmpTableName); }
+                            catch (Exception) { }
+                            if (TmpTableIndex == -1)     //  Если в имени датасета указан не индекс а имя таблицы
+                            {   // Имя таблицы совподает занчит надо взвести наш флаг
+                                if (TmpTableName == Tab.TableName) FlagAddRow = TmpFlagAddRow;
+                            }
+                            else                         // В имени датасета указан индекс а не имя таблицы
+                            {   // Индекс таблицы совподает значит надо взвести наш флаг
+                                if (TmpTableIndex == Tab.Index) FlagAddRow = TmpFlagAddRow;
+                            }
 
-                                //Если найден объект который потенциально может быть итогом в нашем датасете
-                                if (TmpTotalColumn == "3")
+                            // Если обнаружена именно та таблица которыю мы обрабатываем
+                            if (!string.IsNullOrWhiteSpace(FlagAddRow))
+                            { 
+                                // тогда нужно выбрать какой подиток вывести
+                                if (tmpCell.IndexOf(FlagAddRow + ".T") > -1)
                                 {
-                                    tmpCell = tmpCell.Replace(FlagAddRow + ".T" + TmpTotalColumn + "}", "Итог новый");
-                                    itemT.Rows[i + 1].Cells[ic + 1].Range.Text = tmpCell;
-                                }
+                                    // Вырезаем имя тотала
+                                    bool TmpFlatCurTotal = false;
+                                    string TmpTotalColumn = tmpCell.Substring(tmpCell.IndexOf(FlagAddRow + ".T") + FlagAddRow.Length + 2, tmpCell.IndexOf("}", tmpCell.IndexOf("}")) - tmpCell.IndexOf(FlagAddRow + ".T") - +FlagAddRow.Length - 2);
+                                    int TmpTotalIndex = -1;
+                                    try{ TmpTotalIndex = int.Parse(TmpTotalColumn); }
+                                    catch (Exception){}
+                                    // Пробегаем по всем тоталам
+                                    foreach (Total itemTtl in Tab.TtlList)
+                                    {
+                                        if (TmpTotalIndex == -1)     //  Если в имени датасета указан не индекс а имя таблицы
+                                        {   // Имя таблицы совподает занчит надо взвести наш флаг
+                                            if (TmpTotalColumn == itemTtl.TotalName) TmpFlatCurTotal = true;
+                                        }
+                                        else                         // В имени датасета указан индекс а не имя таблицы
+                                        {   // Индекс таблицы совподает значит надо взвести наш флаг
+                                            if (TmpTotalIndex == itemTtl.Index) TmpFlatCurTotal = true;
+                                        }
 
-                                // Если это тотал то не нужно разрезать на строки
-                                FlagAddRow = null;
+                                        //Если найден объект который является тоталом
+                                        if (TmpFlatCurTotal)
+                                        {
+                                            tmpCell = tmpCell.Replace(FlagAddRow + ".T" + TmpTotalColumn + "}", itemTtl.TotalValue);
+                                            itemT.Rows[i + 1].Cells[ic + 1].Range.Text = tmpCell;
+
+                                            // Если в этой ячейке нашли тотал то нет смысла перебирать и искать другие тоталы которые существуют в этой табичке
+                                            break;
+                                        }
+                                    }
+
+                                    // Если это тотал то не нужно разрезать на строки в любом случае
+                                    FlagAddRow = null;
+                                }
                             }
                         }
                     }
@@ -327,6 +322,7 @@ namespace WordDotx
                         // пробегаем по строкам которые нужно воткнуть
                         for (int io = 0; io < Tab.TableValue.Rows.Count; io++)
                         {
+
                             // не понял логики но тут вставит строку до той которую мы нашли
                             itemT.Rows.Add(itemT.Rows[i + io + 1]);
 
@@ -344,12 +340,30 @@ namespace WordDotx
 
                                     for (int ColI = 0; ColI < Tab.TableValue.Columns.Count; ColI++)
                                     {
-                                        tmpCell = tmpCell.Replace(FlagAddRow + ".C"+ ColI + "}", Tab.TableValue.Rows[io][ColI].ToString());
+                                        // запоминаем начальное значение ячейки
+                                        string tmpCellStart = tmpCell;
+
+                                        // Подмена по индексу колонки
+                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.TableName, ColI), Tab.TableValue.Rows[io][ColI].ToString());
+
+                                        // подмена по имени колонки
+                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.TableName, Tab.TableValue.Columns[ColI].ColumnName), Tab.TableValue.Rows[io][ColI].ToString());
+
+                                        // Подмена по индексу колонки
+                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.Index, ColI), Tab.TableValue.Rows[io][ColI].ToString());
+
+                                        // подмена по имени колонки
+                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.Index, Tab.TableValue.Columns[ColI].ColumnName), Tab.TableValue.Rows[io][ColI].ToString());
+
+                                        // если ячейка изменилась значит найдено необходимое значенние и другие значения искать не нужно
+                                        if (tmpCell != tmpCellStart) break;
                                     }
 
                                     itemT.Rows[i + io + 1].Cells[ic + 1].Range.Text = tmpCell;
                                 }
                             }
+
+                            // предпологаю что если есть группировка, то надо где то в этом месте делать объединение с предыдужей ячейкой
 
                         }
 
