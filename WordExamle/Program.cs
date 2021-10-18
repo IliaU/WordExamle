@@ -71,7 +71,7 @@ namespace WordExamle
                 // Запускаем формирование отчёта
                 SrvStatic.StartCreateReport(Tsk);
 
-                
+
 
                 Console.WriteLine(string.Format("Success"));
             }
@@ -80,7 +80,7 @@ namespace WordExamle
                 Console.WriteLine(string.Format("ERROR: {0}", ex.Message));
             }
 
-            //Console.ReadLine();
+            Console.ReadLine();
         }
     }
 }

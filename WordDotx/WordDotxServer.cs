@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Word = Microsoft.Office.Interop.Word;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace WordDotx
 {
@@ -44,7 +45,7 @@ namespace WordDotx
         {
             try
             {
-                if (obj==null)
+                if (obj == null)
                 {
                     this.DefaultPathSource = DefaultPathSource;
                     this.DefaultPathTarget = DefaultPathTarget;
@@ -128,9 +129,9 @@ namespace WordDotx
                     Object pathToSaveObj = (Tsk.Target.IndexOf(@"\") > 0 ? Tsk.Target : string.Format(@"{0}\{1}", this.DefaultPathTarget, Tsk.Target));
 
                     // Проверка путей
-                    if (templatePathObj==null || string.IsNullOrWhiteSpace(templatePathObj.ToString())) throw new ApplicationException(string.Format("Не указан файл шаблона"));
+                    if (templatePathObj == null || string.IsNullOrWhiteSpace(templatePathObj.ToString())) throw new ApplicationException(string.Format("Не указан файл шаблона"));
                     if (!File.Exists(templatePathObj.ToString())) throw new ApplicationException(string.Format("Шаблон не найден по пути: ({0})", templatePathObj.ToString()));
-                    if (pathToSaveObj==null || string.IsNullOrWhiteSpace(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("Не указан файл relf куда сохранить результат."));
+                    if (pathToSaveObj == null || string.IsNullOrWhiteSpace(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("Не указан файл relf куда сохранить результат."));
                     string DirTmp = Path.GetDirectoryName(pathToSaveObj.ToString());
                     if (!Directory.Exists(DirTmp)) throw new ApplicationException(string.Format("Целевой директории в которой должен лежать файл не существует: ({0})", templatePathObj));
                     if (!TmpReplaseFileTarget && File.Exists(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("В Целевой папке уже существует файл с таким именем: ({0})", pathToSaveObj.ToString()));
@@ -165,7 +166,7 @@ namespace WordDotx
                             foreach (Word.Table itemT in document.Tables)
                             {
                                 // Вызываем процесс обработки таблиц
-                                ProcessTable(item, itemT);
+                                ProcessTable(item, itemT, document);
                             }
                         }
 
@@ -217,7 +218,8 @@ namespace WordDotx
         /// </summary>
         /// <param name="Tab">Таблица с именем и индексом которую нужно найти и заменить</param>
         /// <param name="itemT">Таблица которую обрабатываем</param>
-        private void ProcessTable(Table Tab, Word.Table itemT)
+        /// <param name="Doc">Документ</param>
+        private void ProcessTable(Table Tab, Word.Table itemT, Word._Document Doc)
         {
             try
             {
@@ -225,96 +227,110 @@ namespace WordDotx
                 {
                     string FlagAddRow = null;
 
-                    for (int ic = 0; ic < itemT.Rows[i + 1].Cells.Count; ic++)
+                    for (int ic = 0; ic < itemT.Columns.Count; ic++)
                     {
-                        // получаем содержимое
-                        string tmpCell = itemT.Rows[i + 1].Cells[ic + 1].Range.Text;
-                        if (itemT.Rows[i + 1].Cells[ic + 1].Tables.Count > 0)
+                        try
                         {
-                            // сначала перестраиваем внутренние таблицы
-                            foreach (Word.Table itemTTinput in itemT.Rows[i + 1].Cells[ic + 1].Tables)
+                            // получаем содержимое
+                            string tmpCell = itemT.Cell(i + 1, ic + 1).Range.Text;
+                            if (itemT.Cell(i + 1, ic + 1).Tables.Count > 0)
                             {
-                                // обработка внутренней таблицы
-                                ProcessTable(Tab, itemTTinput);
-                            }
-
-                            // Заново перечитаем переменную
-                            tmpCell = itemT.Rows[i + 1].Cells[ic + 1].Range.Text;
-
-                            // И вот теперь подмениваем с правильным содержимым
-                            foreach (Word.Table itemTTinput in itemT.Rows[i + 1].Cells[ic + 1].Tables)
-                            {
-                                // Вот тут сложнее. Надо убрать все символы внутренней таблицы между внутри нашего текста для того чтобы мы не отреогировали и не вставили строку когда она относится ко внутренней таблице
-                                string DelitStr = itemTTinput.Range.Text;
-                                tmpCell = tmpCell.Replace(DelitStr, "");
-                            }
-                        }
-
-                        // Поиск системных символов
-                        if (tmpCell.IndexOf("\r\r") == 0) tmpCell = tmpCell.Substring(2);                                        // вначале ячейки встаёт системные символы их учитывать не надо
-                        if (tmpCell.IndexOf("\r\a") == tmpCell.Length - 2) tmpCell = tmpCell.Substring(0, tmpCell.Length - 2);   // вконце ячейки встаёт системные символы их учитывать не надо
-                        tmpCell = tmpCell.Replace("\r", "");  // режем системные символы они нам тут не к чему
-
-                        //Если найден объект который потенциально может быть в нашем датасете
-                        if (tmpCell.IndexOf("{@D") > -1)
-                        {
-                            // Получаем флаг
-                            string TmpFlagAddRow = tmpCell.Substring(tmpCell.IndexOf("{@D"), tmpCell.IndexOf(".", tmpCell.IndexOf("{@D")) - tmpCell.IndexOf("{@D"));
-
-                            // Получаем имя таблицы и проверяем что она соответствует той что мы сейчас смотрим
-                            string TmpTableName = TmpFlagAddRow.Substring(tmpCell.IndexOf("D") + 1, TmpFlagAddRow.Length - tmpCell.IndexOf("D") - 1);
-                            int TmpTableIndex = -1;
-                            try { TmpTableIndex = int.Parse(TmpTableName); }
-                            catch (Exception) { }
-                            if (TmpTableIndex == -1)     //  Если в имени датасета указан не индекс а имя таблицы
-                            {   // Имя таблицы совподает занчит надо взвести наш флаг
-                                if (TmpTableName == Tab.TableName) FlagAddRow = TmpFlagAddRow;
-                            }
-                            else                         // В имени датасета указан индекс а не имя таблицы
-                            {   // Индекс таблицы совподает значит надо взвести наш флаг
-                                if (TmpTableIndex == Tab.Index) FlagAddRow = TmpFlagAddRow;
-                            }
-
-                            // Если обнаружена именно та таблица которыю мы обрабатываем
-                            if (!string.IsNullOrWhiteSpace(FlagAddRow))
-                            { 
-                                // тогда нужно выбрать какой подиток вывести
-                                if (tmpCell.IndexOf(FlagAddRow + ".T") > -1)
+                                // сначала перестраиваем внутренние таблицы
+                                foreach (Word.Table itemTTinput in itemT.Cell(i + 1, ic + 1).Tables)
                                 {
-                                    // Вырезаем имя тотала
-                                    bool TmpFlatCurTotal = false;
-                                    string TmpTotalColumn = tmpCell.Substring(tmpCell.IndexOf(FlagAddRow + ".T") + FlagAddRow.Length + 2, tmpCell.IndexOf("}", tmpCell.IndexOf("}")) - tmpCell.IndexOf(FlagAddRow + ".T") - +FlagAddRow.Length - 2);
-                                    int TmpTotalIndex = -1;
-                                    try{ TmpTotalIndex = int.Parse(TmpTotalColumn); }
-                                    catch (Exception){}
-                                    // Пробегаем по всем тоталам
-                                    foreach (Total itemTtl in Tab.TtlList)
+                                    // обработка внутренней таблицы
+                                    ProcessTable(Tab, itemTTinput, Doc);
+                                }
+
+                                // Заново перечитаем переменную
+                                tmpCell = itemT.Cell(i + 1, ic + 1).Range.Text;
+
+                                // И вот теперь подмениваем с правильным содержимым
+                                foreach (Word.Table itemTTinput in itemT.Cell(i + 1, ic + 1).Tables)
+                                {
+                                    // Вот тут сложнее. Надо убрать все символы внутренней таблицы между внутри нашего текста для того чтобы мы не отреогировали и не вставили строку когда она относится ко внутренней таблице
+                                    string DelitStr = itemTTinput.Range.Text;
+                                    tmpCell = tmpCell.Replace(DelitStr, "");
+                                }
+                            }
+
+                            // Поиск системных символов
+                            if (tmpCell.IndexOf("\r\r") == 0) tmpCell = tmpCell.Substring(2);                                        // вначале ячейки встаёт системные символы их учитывать не надо
+                            if (tmpCell.IndexOf("\r\a") == tmpCell.Length - 2) tmpCell = tmpCell.Substring(0, tmpCell.Length - 2);   // вконце ячейки встаёт системные символы их учитывать не надо
+                            tmpCell = tmpCell.Replace("\r", "");  // режем системные символы они нам тут не к чему
+
+                            //Если найден объект который потенциально может быть в нашем датасете
+                            if (tmpCell.IndexOf("{@D") > -1)
+                            {
+                                // Получаем флаг
+                                string TmpFlagAddRow = tmpCell.Substring(tmpCell.IndexOf("{@D"), tmpCell.IndexOf(".", tmpCell.IndexOf("{@D")) - tmpCell.IndexOf("{@D"));
+
+                                // Получаем имя таблицы и проверяем что она соответствует той что мы сейчас смотрим
+                                string TmpTableName = TmpFlagAddRow.Substring(tmpCell.IndexOf("D") + 1, TmpFlagAddRow.Length - tmpCell.IndexOf("D") - 1);
+                                int TmpTableIndex = -1;
+                                try { TmpTableIndex = int.Parse(TmpTableName); }
+                                catch (Exception) { }
+                                if (TmpTableIndex == -1)     //  Если в имени датасета указан не индекс а имя таблицы
+                                {   // Имя таблицы совподает занчит надо взвести наш флаг
+                                    if (TmpTableName == Tab.TableName) FlagAddRow = TmpFlagAddRow;
+                                }
+                                else                         // В имени датасета указан индекс а не имя таблицы
+                                {   // Индекс таблицы совподает значит надо взвести наш флаг
+                                    if (TmpTableIndex == Tab.Index) FlagAddRow = TmpFlagAddRow;
+                                }
+
+                                // Если обнаружена именно та таблица которыю мы обрабатываем
+                                if (!string.IsNullOrWhiteSpace(FlagAddRow))
+                                {
+                                    // тогда нужно выбрать какой подиток вывести
+                                    if (tmpCell.IndexOf(FlagAddRow + ".T") > -1)
                                     {
-                                        if (TmpTotalIndex == -1)     //  Если в имени датасета указан не индекс а имя таблицы
-                                        {   // Имя таблицы совподает занчит надо взвести наш флаг
-                                            if (TmpTotalColumn == itemTtl.TotalName) TmpFlatCurTotal = true;
-                                        }
-                                        else                         // В имени датасета указан индекс а не имя таблицы
-                                        {   // Индекс таблицы совподает значит надо взвести наш флаг
-                                            if (TmpTotalIndex == itemTtl.Index) TmpFlatCurTotal = true;
-                                        }
-
-                                        //Если найден объект который является тоталом
-                                        if (TmpFlatCurTotal)
+                                        // Вырезаем имя тотала
+                                        bool TmpFlatCurTotal = false;
+                                        string TmpTotalColumn = tmpCell.Substring(tmpCell.IndexOf(FlagAddRow + ".T") + FlagAddRow.Length + 2, tmpCell.IndexOf("}", tmpCell.IndexOf("}")) - tmpCell.IndexOf(FlagAddRow + ".T") - +FlagAddRow.Length - 2);
+                                        int TmpTotalIndex = -1;
+                                        try { TmpTotalIndex = int.Parse(TmpTotalColumn); }
+                                        catch (Exception) { }
+                                        // Пробегаем по всем тоталам
+                                        foreach (Total itemTtl in Tab.TtlList)
                                         {
-                                            tmpCell = tmpCell.Replace(FlagAddRow + ".T" + TmpTotalColumn + "}", itemTtl.TotalValue);
-                                            itemT.Rows[i + 1].Cells[ic + 1].Range.Text = tmpCell;
+                                            if (TmpTotalIndex == -1)     //  Если в имени датасета указан не индекс а имя таблицы
+                                            {   // Имя таблицы совподает занчит надо взвести наш флаг
+                                                if (TmpTotalColumn == itemTtl.TotalName) TmpFlatCurTotal = true;
+                                            }
+                                            else                         // В имени датасета указан индекс а не имя таблицы
+                                            {   // Индекс таблицы совподает значит надо взвести наш флаг
+                                                if (TmpTotalIndex == itemTtl.Index) TmpFlatCurTotal = true;
+                                            }
 
-                                            // Если в этой ячейке нашли тотал то нет смысла перебирать и искать другие тоталы которые существуют в этой табичке
-                                            break;
+                                            //Если найден объект который является тоталом
+                                            if (TmpFlatCurTotal)
+                                            {
+                                                tmpCell = tmpCell.Replace(FlagAddRow + ".T" + TmpTotalColumn + "}", itemTtl.TotalValue);
+                                                itemT.Cell(i + 1, ic + 1).Range.Text = tmpCell;
+
+                                                // Если в этой ячейке нашли тотал то нет смысла перебирать и искать другие тоталы которые существуют в этой табичке
+                                                break;
+                                            }
                                         }
-                                    }
 
-                                    // Если это тотал то не нужно разрезать на строки в любом случае
-                                    FlagAddRow = null;
+                                        // Если это тотал то не нужно разрезать на строки в любом случае
+                                        FlagAddRow = null;
+                                    }
                                 }
                             }
                         }
+                        catch (COMException ex)
+                        {
+                            switch (ex.ErrorCode)
+                            {
+                                case -2146822347:   // Запрашиваемый номер семейства не существует.
+                                    break;
+                                default:
+                                    throw ex;
+                            }
+                        }
+                        catch (Exception ex) { throw ex; }
                     }
 
                     if (!string.IsNullOrWhiteSpace(FlagAddRow))
@@ -322,53 +338,72 @@ namespace WordDotx
                         // пробегаем по строкам которые нужно воткнуть
                         for (int io = 0; io < Tab.TableValue.Rows.Count; io++)
                         {
-
-                            // не понял логики но тут вставит строку до той которую мы нашли
-                            itemT.Rows.Add(itemT.Rows[i + io + 1]);
-
-                            // пробегаем поячейкам походу так попадаем на нашу вставленную строку так как она вотнётся до той что копировали
-                            // foreach (Word.Cell item in itemT.Rows[i + 1].Cells)
-                            for (int ic = 0; ic < itemT.Rows[i + 1].Cells.Count; ic++)
+                            try
                             {
-                                // Походу тут отсчёт идёт не от нуля а от еденицы по крайней мере в колонках
-                                string tmpCell = itemT.Rows[i + io + 2].Cells[ic + 1].Range.Text;
-                                if (!string.IsNullOrWhiteSpace(tmpCell))
+                                // не понял логики но тут вставит строку до той которую мы нашли
+                                //itemT.Rows.Add(itemT.Rows[i + io + 1]);
+                                //itemT.Rows.Add(itemT.Cell(i + io + 1, 1).Row);
+                                // При этих вариантах падает с ошибкой Отсутствует доступ к отдельным строкам, поскольку таблица имеет ячейки, объединенные по вертикали. зато можно найти любой диапазон представить в виде строки и его добавить
+                                Doc.Range(itemT.Cell(i + io + 1, 1).Range.Start, itemT.Cell(i + io + 1, itemT.Columns.Count).Range.End).Rows.Add(Doc.Range(itemT.Cell(i + io + 1, 1).Range.Start, itemT.Cell(i + io + 1, itemT.Columns.Count).Range.End).Rows);
+
+                                // пробегаем поячейкам походу так попадаем на нашу вставленную строку так как она вотнётся до той что копировали
+                                // foreach (Word.Cell item in itemT.Rows[i + 1].Cells)
+                                for (int ic = 0; ic < itemT.Columns.Count; ic++)
                                 {
-                                    if (tmpCell.IndexOf("\r\r") == 0) tmpCell = tmpCell.Substring(2);                                        // вначале ячейки встаёт системные символы их учитывать не надо
-                                    if (tmpCell.IndexOf("\r\a") == tmpCell.Length - 2) tmpCell = tmpCell.Substring(0, tmpCell.Length - 2);   // вконце ячейки встаёт системные символы их учитывать не надо
-                                    if (tmpCell.IndexOf("\r\a") == 0 && tmpCell.Length == 2) tmpCell = tmpCell.Replace("\r", "");              // В пустых колонках иногда бывате такая комбинация
-
-                                    for (int ColI = 0; ColI < Tab.TableValue.Columns.Count; ColI++)
+                                    // Походу тут отсчёт идёт не от нуля а от еденицы по крайней мере в колонках
+                                    string tmpCell = itemT.Cell(i + io + 2, ic + 1).Range.Text;
+                                    if (!string.IsNullOrWhiteSpace(tmpCell))
                                     {
-                                        // запоминаем начальное значение ячейки
-                                        string tmpCellStart = tmpCell;
+                                        if (tmpCell.IndexOf("\r\r") == 0) tmpCell = tmpCell.Substring(2);                                        // вначале ячейки встаёт системные символы их учитывать не надо
+                                        if (tmpCell.IndexOf("\r\a") == tmpCell.Length - 2) tmpCell = tmpCell.Substring(0, tmpCell.Length - 2);   // вконце ячейки встаёт системные символы их учитывать не надо
+                                        if (tmpCell.IndexOf("\r\a") == 0 && tmpCell.Length == 2) tmpCell = tmpCell.Replace("\r", "");              // В пустых колонках иногда бывате такая комбинация
 
-                                        // Подмена по индексу колонки
-                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.TableName, ColI), Tab.TableValue.Rows[io][ColI].ToString());
+                                        for (int ColI = 0; ColI < Tab.TableValue.Columns.Count; ColI++)
+                                        {
+                                            // запоминаем начальное значение ячейки
+                                            string tmpCellStart = tmpCell;
 
-                                        // подмена по имени колонки
-                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.TableName, Tab.TableValue.Columns[ColI].ColumnName), Tab.TableValue.Rows[io][ColI].ToString());
+                                            // Подмена по индексу колонки
+                                            tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.TableName, ColI), Tab.TableValue.Rows[io][ColI].ToString());
 
-                                        // Подмена по индексу колонки
-                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.Index, ColI), Tab.TableValue.Rows[io][ColI].ToString());
+                                            // подмена по имени колонки
+                                            tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.TableName, Tab.TableValue.Columns[ColI].ColumnName), Tab.TableValue.Rows[io][ColI].ToString());
 
-                                        // подмена по имени колонки
-                                        tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.Index, Tab.TableValue.Columns[ColI].ColumnName), Tab.TableValue.Rows[io][ColI].ToString());
+                                            // Подмена по индексу колонки
+                                            tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.Index, ColI), Tab.TableValue.Rows[io][ColI].ToString());
 
-                                        // если ячейка изменилась значит найдено необходимое значенние и другие значения искать не нужно
-                                        if (tmpCell != tmpCellStart) break;
+                                            // подмена по имени колонки
+                                            tmpCell = tmpCell.Replace(string.Format("{{@D{0}.C{1}}}", Tab.Index, Tab.TableValue.Columns[ColI].ColumnName), Tab.TableValue.Rows[io][ColI].ToString());
+
+                                            // если ячейка изменилась значит найдено необходимое значенние и другие значения искать не нужно
+                                            if (tmpCell != tmpCellStart) break;
+                                        }
+
+                                        itemT.Cell(i + io + 1, ic + 1).Range.Text = tmpCell;
                                     }
+                                }
 
-                                    itemT.Rows[i + io + 1].Cells[ic + 1].Range.Text = tmpCell;
+                                // предпологаю что если есть группировка, то надо где то в этом месте делать объединение с предыдужей ячейкой
+
+                            }
+                            catch (COMException ex)
+                            {
+                                switch (ex.ErrorCode)
+                                {
+                                    case -2146822347:   // Запрашиваемый номер семейства не существует.
+                                        break;
+                                    default:
+                                        throw ex;
                                 }
                             }
-
-                            // предпологаю что если есть группировка, то надо где то в этом месте делать объединение с предыдужей ячейкой
+                            catch (Exception ex) { throw ex; }
 
                         }
 
                         // Удаляем нашу строку с шаблоном
-                        itemT.Rows[i + 1 + Tab.TableValue.Rows.Count].Delete();
+                        //itemT.Rows[i + 1 + Tab.TableValue.Rows.Count].Delete();
+                        // При этих вариантах падает с ошибкой Отсутствует доступ к отдельным строкам, поскольку таблица имеет ячейки, объединенные по вертикали. Зато можно найти любой диапазон представить в виде строки и его удалить
+                        Doc.Range(itemT.Cell(i + 1 + Tab.TableValue.Rows.Count, 1).Range.Start, itemT.Cell(i + 1 + Tab.TableValue.Rows.Count, itemT.Columns.Count).Range.End).Rows.Delete();
 
                         // Перепрыгиваем на следующую строку чтобы не обрабатыать повтороно вставленные строки
                         i = i + Tab.TableValue.Rows.Count - 1;
