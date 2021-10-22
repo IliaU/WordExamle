@@ -9,8 +9,19 @@ namespace WordDotx
     /// <summary>
     /// Класс представляет изсебя задание для сервера
     /// </summary>
-    public class TaskWord
+    public class TaskWord: Lib.TaskWordBase
     {
+        /// <summary>
+        /// Если на основе задания был сделан результат то ссылка на этот результат присваивается в самом задании
+        /// </summary>
+        public new RezultTask RezTsk
+        {
+            get
+            {
+                return (RezultTask)base.RezTsk;
+            }
+        }
+
         /// <summary>
         /// Путь к файлу шаблона или имя файла тогда папка будет использоваться заданная по умолчанию при инициализации класса
         /// </summary>
@@ -27,11 +38,6 @@ namespace WordDotx
         public BookmarkList BkmrkL { get; private set; }
 
         /// <summary>
-        /// Список таблиц который будем использовать
-        /// </summary>
-        public TableList TblL { get; private set; }
-
-        /// <summary>
         /// Замена в папке назначения файла если уже ст таким именем файл существует
         /// </summary>
         public bool ? ReplaseFileTarget { get; private set; }
@@ -44,19 +50,18 @@ namespace WordDotx
         /// <param name="BkmrkL">Список закладок которые мы будем использовать</param>
         /// <param name="TblL">Список таблиц который будем использовать</param>
         /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
-        public TaskWord(string Source, string Target, BookmarkList BkmrkL, TableList TblL, bool? ReplaseFileTarget)
+        public TaskWord(string Source, string Target, BookmarkList BkmrkL, TableList TblL, bool? ReplaseFileTarget) :base(TblL)
         {
             try
             {
                 this.Source = Source;
                 this.Target = Target;
                 this.BkmrkL = BkmrkL;
-                this.TblL = TblL;
                 this.ReplaseFileTarget = ReplaseFileTarget;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
+                throw new ApplicationException(string.Format("{0}   Упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
             }
         }
         //
@@ -68,7 +73,7 @@ namespace WordDotx
         /// <param name="Bkmrk">Закладока которые мы будем использовать</param>
         /// <param name="Tbl">Таблица который будем использовать</param>
         /// <param name="ReplaseFileTarget">Замена в папке назначения файла если уже ст таким именем файл существует</param>
-        public TaskWord (string Source, string Target, Bookmark Bkmrk, Table Tbl, bool ReplaseFileTarget) : this (Source, Target, new BookmarkList(), new TableList(), ReplaseFileTarget)
+        public TaskWord (string Source, string Target, Bookmark Bkmrk, Table Tbl, bool ReplaseFileTarget) : this (Source, Target, new BookmarkList(), new TableList(), ReplaseFileTarget) 
         {
             try
             {
@@ -78,7 +83,7 @@ namespace WordDotx
 
                 TableList TblL = new TableList();
                 TblL.Add(Tbl, true);
-                this.TblL = TblL;
+                base.setTableList(TblL);
             }
             catch (Exception ex)
             {
@@ -100,7 +105,7 @@ namespace WordDotx
             {
                 TableList TblL = new TableList();
                 TblL.Add(Tbl, true);
-                this.TblL = TblL;
+                base.setTableList(TblL);
             }
             catch (Exception ex)
             {
@@ -167,7 +172,7 @@ namespace WordDotx
 
                 TableList TblL = new TableList();
                 TblL.Add(Tbl, true);
-                this.TblL = TblL;
+                base.setTableList(TblL);
             }
             catch (Exception ex)
             {
@@ -188,7 +193,7 @@ namespace WordDotx
             {
                 TableList TblL = new TableList();
                 TblL.Add(Tbl, true);
-                this.TblL = TblL;
+                base.setTableList(TblL);
             }
             catch (Exception ex)
             {

@@ -46,17 +46,30 @@
   <ItemGroup>
     <Compile Include="BookmarkList.cs" />
     <Compile Include="Bookmarks.cs" />
+    <Compile Include="EnStatusTask.cs" />
+    <Compile Include="EvTaskWordEnd.cs" />
+    <Compile Include="EvTaskWordError.cs" />
+    <Compile Include="EvTaskWordStart.cs" />
+    <Compile Include="EvWorkerError.cs" />
+    <Compile Include="EvWorkerListError.cs" />
     <Compile Include="FarmWordDotx.cs" />
     <Compile Include="Lib\BookmarkBase.cs" />
+    <Compile Include="Lib\EvWorkerBaseError.cs" />
     <Compile Include="Lib\TableBase.cs" />
+    <Compile Include="Lib\TaskWordBase.cs" />
     <Compile Include="Lib\TotalBase.cs" />
+    <Compile Include="Lib\WorkerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RezultTask.cs" />
+    <Compile Include="RezultTaskAffectetdRow.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableList.cs" />
     <Compile Include="TaskWord.cs" />
     <Compile Include="Total.cs" />
     <Compile Include="TotalList.cs" />
     <Compile Include="WordDotxServer.cs" />
+    <Compile Include="Worker.cs" />
+    <Compile Include="WorkerList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

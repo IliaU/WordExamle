@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 using System.Data;
 using WordDotx;
@@ -14,20 +14,7 @@ namespace WordExamle
         static void Main(string[] args)
         {
             try
-            {
-                // Можно смотреть версию приложения и понимать нужно ли попросить обновиться пользователя или нет
-                int[] ver = FarmWordDotx.VersionDll;
-
-                // Хотим создавать статичный класс которы будет обрабатывать наши объекты
-                // Метод имее перегрузку можно указать входную и выходную папку по умолчанию где берём шаблоны для обработки и куда клоадём результат
-                WordDotxServer SrvStatic = FarmWordDotx.CreateWordDotxServer();
-
-                // Так можно обращаться к текущему серверу если хоть раз его инициировали то он создаётся
-                SrvStatic = FarmWordDotx.CurrentWordDotxServer;
-
-                // Можно создать отдельный екземпляр который сможет работать асинхронно со своими параметрами
-                WordDotxServer Srv2 = new WordDotxServer("dd", "rrr");
-
+            {              
                 // Создаём список закладок
                 BookmarkList BmL = new BookmarkList();
                 Bookmark Bm = new Bookmark("Z1", "НОВЫЙ ТЕКСТ");
@@ -68,12 +55,32 @@ namespace WordExamle
                 // Создаём задание
                 TaskWord Tsk = new TaskWord(Environment.CurrentDirectory.Replace(@"WordExamle\bin\Debug", @"Шаблон.dotx"), Environment.CurrentDirectory.Replace(@"WordExamle\bin\Debug", @"Результат.doc"), BmL, TabL, true);
 
-                // Запускаем формирование отчёта
-                SrvStatic.StartCreateReport(Tsk);
+                // запускаем асинхронно но в несколько потоков
+                List<TaskWord>  rezL = StartASinchronePool(Tsk);
 
+                // запускаем асинхронно но в один поток
+                //TaskWord rez = StartASinchrone(Tsk);
+
+                // Запускаем формирование отчёта в синхронном режиме
+                //StartSinchrone(Tsk);
 
 
                 Console.WriteLine(string.Format("Success"));
+
+
+                /*
+                 
+                // Можно смотреть версию приложения и понимать нужно ли попросить обновиться пользователя или нет
+                int[] ver = FarmWordDotx.VersionDll;
+
+                // Хотим создавать статичный класс которы будет обрабатывать наши объекты
+                // Метод имее перегрузку можно указать входную и выходную папку по умолчанию где берём шаблоны для обработки и куда клоадём результат
+                WordDotxServer SrvStatic = FarmWordDotx.CreateWordDotxServer();
+
+                // Так можно обращаться к текущему серверу если хоть раз его инициировали то он создаётся
+                SrvStatic = FarmWordDotx.CurrentWordDotxServer;
+
+                 */
             }
             catch (Exception ex)
             {
@@ -81,6 +88,81 @@ namespace WordExamle
             }
 
             Console.ReadLine();
+        }
+
+        /// <summary>
+        /// Запускаем формирование отчёта в синхронном режиме
+        /// </summary>
+        /// <param name="Tsk"></param>
+        private static List<TaskWord> StartASinchronePool(TaskWord Tsk)
+        {
+            FarmWordDotx.PoolWorkerList.onEvTaskWordEnd += PoolWorkerList_onEvTaskWordEnd;
+
+            // Запускаем пул с несколькими потоками по усолчанию с количеством как физическое кол-во CPU
+            FarmWordDotx.PoolWorkerList.Start();
+
+            // Добавляем задание в очередь
+            RezultTask rez = FarmWordDotx.QueTaskWordAdd(Tsk);
+
+            // Небольшая пауза чтобы успел завестись парралельный поток в реальной жизни не нужно так как кгда останавливаем мы не хотим дожидаться завершения всех потоков
+            Thread.Sleep(1000);
+
+            // Можно смотреть что сейчас выполняется и получать стату по задачам которые сейчас в процессе
+            List<TaskWord> TskL = FarmWordDotx.PoolWorkerList.GetTaskWordList();
+
+            // Останавливаем наш пул
+            FarmWordDotx.PoolWorkerList.Stop();
+            FarmWordDotx.PoolWorkerList.Join();
+
+            return TskL;
+        }
+        // Вот так можно подписаться и получать события когда наши задания будут выполняться
+        private static void PoolWorkerList_onEvTaskWordEnd(object sender, EvTaskWordEnd e)
+        {
+            TaskWord Tsk = e.Tsk;
+        }
+
+
+        /// <summary>
+        /// Запускаем формирование отчёта в синхронном режиме
+        /// </summary>
+        /// <param name="Tsk"></param>
+        private static TaskWord StartASinchrone(TaskWord Tsk)
+        {
+            Worker wrk = new Worker();
+            wrk.Start();
+
+            // Добавляем задание в очередь
+            RezultTask rez = FarmWordDotx.QueTaskWordAdd(Tsk);
+
+            // Небольшая пауза чтобы успел завестись парралельный поток в реальной жизни не нужно так как кгда останавливаем мы не хотим дожидаться завершения всех потоков
+            Thread.Sleep(1000);
+
+            // Если гдето задание потеряли то его можно получить посмотрев что сейчас выполняеки работник
+            TaskWord rrr = wrk.TaskWrk;
+
+            // А уже в любом задании можно получить результат для того ытобы посмотреть на какой стадии работа
+            rez = Tsk.RezTsk;
+                
+            // Команду 
+            wrk.Stop();
+            wrk.Join();
+
+            return rrr;
+        }
+
+
+        /// <summary>
+        /// Запускаем формирование отчёта в синхронном режиме
+        /// </summary>
+        /// <param name="Tsk"></param>
+        private static void StartSinchrone(TaskWord Tsk)
+        {
+            // Можно создать отдельный екземпляр который сможет работать асинхронно со своими параметрами
+            WordDotxServer SrvStatic = new WordDotxServer("dd", "rrr");
+
+            // Запускаем формирование отчёта в синхронном режиме
+            SrvStatic.StartCreateReport(Tsk);
         }
     }
 }

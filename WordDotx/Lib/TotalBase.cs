@@ -31,6 +31,7 @@ namespace WordDotx.Lib
         {
             try
             {
+                this.Index = -1;
                 this.TotalName = TotalName;
             }
             catch (Exception ex)
@@ -176,61 +177,71 @@ namespace WordDotx.Lib
                 return rez;
             }
 
+
             /// <summary>
-            /// Получение компонента по его ID
+            /// Индексатор
             /// </summary>
-            /// <param name="i">Введите идентификатор</param>
-            /// <returns></returns>
-            public TotalBase getTotalComponent(int i)
+            /// <param name="i">Индекс элемента в массиве</param>
+            /// <returns>возвращаем объект</returns>
+            public TotalBase this[int i]
             {
-                try
+                get
                 {
-                    TotalBase rez = null;
-                    lock (TtlL)
+                    try
                     {
-                        rez = this.TtlL[i];
+                        TotalBase rez = null;
+                        lock (TtlL)
+                        {
+                            rez = this.TtlL[i];
+                        }
+
+                        if (rez == null) throw new ApplicationException(String.Format("Объект с индексом {0} не найден.", i));
+
+                        return rez;
                     }
-
-                    if (rez == null) throw new ApplicationException(String.Format("Объект с индексом {0} не найден.", i));
-
-                    return rez;
+                    catch (Exception ex)
+                    {
+                        throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, i, ex.Message));
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, i, ex.Message));
-                }
+                private set { }
             }
 
+
             /// <summary>
-            /// Получение компонента по его имени
+            /// Индексатор
             /// </summary>
-            /// <param name="s">Введите имя закладки</param>
-            /// <returns></returns>
-            public TotalBase getTotalComponent(string s)
+            /// <param name="s">Введите имя результата</param>
+            /// <returns>возвращаем объект</returns>
+            public TotalBase this[string s]
             {
-                try
+                get
                 {
-                    TotalBase rez = null;
-                    lock (TtlL)
+                    try
                     {
-                        foreach (TotalBase item in this.TtlL)
+                        TotalBase rez = null;
+                        lock (TtlL)
                         {
-                            if (item.TotalName == s)
+                            foreach (TotalBase item in this.TtlL)
                             {
-                                rez = item;
-                                break;
+                                if (item.TotalName == s)
+                                {
+                                    rez = item;
+                                    break;
+                                }
                             }
                         }
+
+                        if (rez == null) throw new ApplicationException(String.Format("Объект с именем {0} не найден.", s));
+
+                        return rez;
                     }
-
-                    if (rez == null) throw new ApplicationException(String.Format("Объект с именем {0} не найден.", s));
-
-                    return rez;
+                    catch (Exception ex)
+                    {
+                        throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, s, ex.Message));
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, s, ex.Message));
-                }
+                private set { }
             }
 
             /// <summary>

@@ -13,7 +13,7 @@ namespace WordDotx
     /// <summary>
     /// Класс для создания сервера который будет обрабатывать запросы
     /// </summary>
-    public class WordDotxServer
+    public class WordDotxServer: Lib.TaskWordBase.RezultTaskBase.WordDotxServerBase
     {
         /// <summary>
         /// Внутренний объект нашего Сервера
@@ -115,6 +115,11 @@ namespace WordDotx
         {
             try
             {
+                if (Tsk.StatusTask == EnStatusTask.Pending) throw new ApplicationException("Данное задание уже находится в очереди асинхронной обработки и должно запускаться через Пул обработки асинхронных запросов."); 
+
+                // выставляем флаг что задание начинает свою работу
+                base.SetStatusTaskWord(Tsk, EnStatusTask.Running);
+
                 bool TmpReplaseFileTarget = this.DefReplaseFileTarget;
                 if (Tsk.ReplaseFileTarget != null) TmpReplaseFileTarget = (bool)Tsk.ReplaseFileTarget;
 
@@ -166,9 +171,12 @@ namespace WordDotx
                             foreach (Word.Table itemT in document.Tables)
                             {
                                 // Вызываем процесс обработки таблиц
-                                ProcessTable(item, itemT, document);
+                                ProcessTable(Tsk, item, itemT, document);
                             }
                         }
+
+                        // выставляем флаг что задание завершено успешно
+                        base.SetStatusTaskWord(Tsk, EnStatusTask.Save);
 
                         // Сохраняем но как вордовский докумен
                         document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument);
@@ -176,6 +184,8 @@ namespace WordDotx
                         // Делаем видимыми все документы в этом приложении
                         //application.Visible = true;
 
+                        // выставляем флаг что задание завершено успешно
+                        base.SetStatusTaskWord(Tsk, EnStatusTask.Success);
                     }
                     catch (Exception ex)
                     {
@@ -208,6 +218,10 @@ namespace WordDotx
             }
             catch (Exception ex)
             {
+                // выставляем флаг что задание завершено c ошибкой
+                base.SetStatusMessage(Tsk, ex.Message);
+                base.SetStatusTaskWord(Tsk, EnStatusTask.ERROR);
+
                 throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
             }
         }
@@ -219,12 +233,25 @@ namespace WordDotx
         /// <param name="Tab">Таблица с именем и индексом которую нужно найти и заменить</param>
         /// <param name="itemT">Таблица которую обрабатываем</param>
         /// <param name="Doc">Документ</param>
-        private void ProcessTable(Table Tab, Word.Table itemT, Word._Document Doc)
+        private void ProcessTable(TaskWord Tsk, Table Tab, Word.Table itemT, Word._Document Doc)
         {
             try
             {
+                // Инициируем объект статистики
+                base.SetInitTableInWordAffected(Tsk, new RezultTaskAffectetdRow(Tab));
+                int FlagPart = 100; // какой промежуток строк через который нужно обновить стату для того чтобы не часто срабатывали события
+                int FlatPartTmp = FlagPart; // Текущее значение счётчика
+
                 for (int i = 0; i < itemT.Rows.Count; i++)
                 {
+                    // Правим статистику у последней таблицы
+                    if (FlatPartTmp > 0) FlatPartTmp--;
+                    else
+                    {
+                        base.SetTableInWordAffected(Tsk, itemT.Rows.Count);
+                        FlatPartTmp = FlagPart;
+                    }
+
                     string FlagAddRow = null;
 
                     for (int ic = 0; ic < itemT.Columns.Count; ic++)
@@ -239,7 +266,7 @@ namespace WordDotx
                                 foreach (Word.Table itemTTinput in itemT.Cell(i + 1, ic + 1).Tables)
                                 {
                                     // обработка внутренней таблицы
-                                    ProcessTable(Tab, itemTTinput, Doc);
+                                    ProcessTable(Tsk, Tab, itemTTinput, Doc);
                                 }
 
                                 // Заново перечитаем переменную
@@ -409,6 +436,9 @@ namespace WordDotx
                         i = i + Tab.TableValue.Rows.Count - 1;
                     }
                 }
+
+                // Правим статистику у последней таблицы и выставляем флаг что она готова
+                base.SetEndTableInWordAffected(Tsk, itemT.Rows.Count);
             }
             catch (Exception ex)
             {

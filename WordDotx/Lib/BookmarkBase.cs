@@ -31,6 +31,7 @@ namespace WordDotx.Lib
         {
             try
             {
+                this.Index = -1;
                 this.BookmarkName = BookmarkName;
             }
             catch (Exception ex)
@@ -176,61 +177,71 @@ namespace WordDotx.Lib
                 return rez;
             }
 
+
             /// <summary>
-            /// Получение компонента по его ID
+            /// Индексатор
             /// </summary>
-            /// <param name="i">Введите идентификатор</param>
-            /// <returns></returns>
-            public BookmarkBase getBookmarkComponent(int i)
+            /// <param name="i">Индекс элемента в массиве</param>
+            /// <returns>возвращаем объект</returns>
+            public BookmarkBase this[int i]
             {
-                try
+                get
                 {
-                    BookmarkBase rez = null;
-                    lock (BkmL)
+                    try
                     {
-                        rez = this.BkmL[i];
+                        BookmarkBase rez = null;
+                        lock (BkmL)
+                        {
+                            rez = this.BkmL[i];
+                        }
+
+                        if (rez == null) throw new ApplicationException(String.Format("Объект с индексом {0} не найден.", i));
+
+                        return rez;
                     }
-
-                    if (rez == null) throw new ApplicationException(String.Format("Объект с индексом {0} не найден.", i));
-
-                    return rez;
+                    catch (Exception ex)
+                    {
+                        throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, i, ex.Message));
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, i, ex.Message));
-                }
+                private set { }
             }
 
+
             /// <summary>
-            /// Получение компонента по его имени
+            /// Индексатор
             /// </summary>
             /// <param name="s">Введите имя закладки</param>
-            /// <returns></returns>
-            public BookmarkBase getBookmarkComponent(string s)
+            /// <returns>возвращаем объект</returns>
+            public BookmarkBase this[string s]
             {
-                try
+                get
                 {
-                    BookmarkBase rez = null;
-                    lock (BkmL)
+                    try
                     {
-                        foreach (BookmarkBase item in this.BkmL)
+                        BookmarkBase rez = null;
+                        lock (BkmL)
                         {
-                            if (item.BookmarkName == s)
+                            foreach (BookmarkBase item in this.BkmL)
                             {
-                                rez = item;
-                                break;
+                                if (item.BookmarkName == s)
+                                {
+                                    rez = item;
+                                    break;
+                                }
                             }
                         }
+
+                        if (rez == null) throw new ApplicationException(String.Format("Объект с именем {0} не найден.", s));
+
+                        return rez;
                     }
-
-                    if (rez==null) throw new ApplicationException(String.Format("Объект с именем {0} не найден.", s));
-
-                    return rez;
+                    catch (Exception ex)
+                    {
+                        throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, s, ex.Message));
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException(string.Format("{0}.getBookmarkComponent({1})   Упали с ошибкой: ({2})", this.GetType().Name, s, ex.Message));
-                }
+                private set { }
             }
 
             /// <summary>

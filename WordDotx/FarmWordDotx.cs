@@ -5,19 +5,40 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Reflection;
+using System.Collections;
 
 namespace WordDotx
 {
     /// <summary>
     /// Класс для создание сервераобработки документов
     /// </summary>
-    public class FarmWordDotx
+    public class FarmWordDotx : Lib.TaskWordBase.FarmWordDotxBase
     {
+        #region  Private Param
         /// <summary>
         /// Внутренний объект нашего Сервера когда сервер должен быть единственным в нашем приложении
         /// </summary>
         private static WordDotxServer _CurrentWordDotxServer;
 
+
+
+        /// <summary>
+        /// Папка по умолчанию для нашего файла с источником шаблонов
+        /// </summary>
+        public static string _DefaultPathSource { get; private set; }
+
+        /// <summary>
+        /// Папка по умолчанию для нашего файла в который положим результат
+        /// </summary>
+        public static string _DefaultPathTarget { get; private set; }
+
+        /// <summary>
+        /// Поведение по умолчанию нужно заменить файл или нет
+        /// </summary>
+        public static bool _DefReplaseFileTarget { get; private set; }
+        #endregion
+
+        #region  Public Param
         /// <summary>
         /// Текущий  объект нашего Сервера когда сервер должен быть единственным в нашем приложении
         /// </summary>
@@ -55,7 +76,55 @@ namespace WordDotx
             private set { }
         }
 
+        /// <summary>
+        /// Количество потоков наших серверов которые будут обрабатывать наши задания
+        /// </summary>
+        //public static int CountParralelPul = Environment.ProcessorCount;
 
+        /// <summary>
+        /// Папка по умолчанию для нашего файла с источником шаблонов
+        /// </summary>
+        public string DefaultPathSource
+        {
+            get
+            {
+                return _DefaultPathSource;
+            }
+            private set { }
+        }
+
+        /// <summary>
+        /// Папка по умолчанию для нашего файла в который положим результат
+        /// </summary>
+        public string DefaultPathTarget
+        {
+            get
+            {
+                return _DefaultPathTarget;
+            }
+            private set { }
+        }
+
+        /// <summary>
+        /// Поведение по умолчанию нужно заменить файл или нет
+        /// </summary>
+        public bool DefReplaseFileTarget
+        {
+            get
+            {
+                return _DefReplaseFileTarget;
+            }
+            private set { }
+        }
+
+        /// <summary>
+        /// Пул который обеспечивает парралельную обработку сразу нескольких заданий
+        /// </summary>
+        public static WorkerList PoolWorkerList = new WorkerList();
+
+        #endregion
+
+        #region  Public Method
         /// <summary>
         /// Создание сервера который будет обрабатывать наши объекты ворда в эдиничном экземпляре
         /// </summary>
@@ -67,7 +136,10 @@ namespace WordDotx
         {
             try
             {
-                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, DefReplaseFileTarget);
+                if (_CurrentWordDotxServer == null)
+                {
+                    _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, DefReplaseFileTarget);
+                }
                 return _CurrentWordDotxServer;
             }
             catch (Exception ex)
@@ -86,7 +158,10 @@ namespace WordDotx
         {
             try
             {
-                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, true);
+                if (_CurrentWordDotxServer == null)
+                {
+                    _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, true);
+                }
                 return _CurrentWordDotxServer;
             }
             catch (Exception ex)
@@ -104,7 +179,10 @@ namespace WordDotx
         {
             try
             {
-                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer(DefPathSorsAndTarget);
+                if (_CurrentWordDotxServer == null)
+                {
+                    _CurrentWordDotxServer = new WordDotxServer(DefPathSorsAndTarget);
+                }
                 return _CurrentWordDotxServer;
             }
             catch (Exception ex)
@@ -121,7 +199,10 @@ namespace WordDotx
         {
             try
             {
-                if (_CurrentWordDotxServer == null) _CurrentWordDotxServer = new WordDotxServer();
+                if (_CurrentWordDotxServer == null)
+                {
+                    _CurrentWordDotxServer = new WordDotxServer();
+                }
                 return _CurrentWordDotxServer;
             }
             catch (Exception ex)
@@ -129,6 +210,9 @@ namespace WordDotx
                 throw new ApplicationException(string.Format("{0}.FarmWordDotx   Упали с ошибкой при создании сервера: ({1})", "FarmWordDotx", ex.Message));
             }
         }
+
+        
+        #endregion
 
     }
 }
