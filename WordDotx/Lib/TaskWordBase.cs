@@ -31,6 +31,27 @@ namespace WordDotx.Lib
         /// </summary>
         public TableList TblL { get; private set; }
 
+
+        /// <summary>
+        /// Реальное создание задания
+        /// </summary>
+        public DateTime CraeteDt { get; private set; }
+
+        /// <summary>
+        /// Реальное установка в очередь нашего задания
+        /// </summary>
+        public DateTime? PendingProcessing { get; private set; }
+
+        /// <summary>
+        /// Реальное начало формированиея отчёта
+        /// </summary>
+        public DateTime? StartProcessing { get; private set; }
+
+        /// <summary>
+        /// Реальное окончание формированиея отчёта
+        /// </summary>
+        public DateTime? EndProcessing { get; private set; }
+
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -38,6 +59,7 @@ namespace WordDotx.Lib
         {
             try
             {
+                this.CraeteDt = DateTime.Now;
                 this.StatusTask = EnStatusTask.None;
                 this.StatusMessage = new List<string>();
                 this.TblL = TblL;
@@ -78,7 +100,6 @@ namespace WordDotx.Lib
             /// Список по каждой таблице внутри шаблона (их может быть больше чем в источнике и количество строк которое уже в каждой из них залито)
             /// </summary>
             public List<RezultTaskAffectetdRow> TableInWordAffectedRowList { get; private set; }
-
 
             /// <summary>
             /// Конструктор который позволяет при создании связать результат с заданием для того чтобы потом отслеживать его
@@ -133,6 +154,21 @@ namespace WordDotx.Lib
                 {
                     try
                     {
+                        switch (Stat)
+                        {
+                            case EnStatusTask.Running:
+                                // Устанавливаем реальный старт процесса формирования отчёта
+                                Tsk.StartProcessing = DateTime.Now;
+                                break;
+                            case EnStatusTask.Success:
+                            case EnStatusTask.ERROR:
+                                // Устанавливаем реальное окончание процесса формирования отчёта
+                                Tsk.EndProcessing = DateTime.Now;
+                                break;
+                            default:
+                                break;
+                        }
+
                         Tsk.StatusTask = Stat;
                     }
                     catch (Exception ex)
@@ -167,11 +203,14 @@ namespace WordDotx.Lib
                 {
                     try
                     {
-                        if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInWordAffectedRowList != null)
+                        if (StatTblRow != null)
                         {
-                            lock (Tsk.RezTsk.TableInWordAffectedRowList)
+                            if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInWordAffectedRowList != null)
                             {
-                                Tsk.RezTsk.TableInWordAffectedRowList.Add(StatTblRow);
+                                lock (Tsk.RezTsk.TableInWordAffectedRowList)
+                                {
+                                    Tsk.RezTsk.TableInWordAffectedRowList.Add(StatTblRow);
+                                }
                             }
                         }
                     }
@@ -287,6 +326,9 @@ namespace WordDotx.Lib
                 {
                     // Создаём класс через который пользователь будет наблюдать за выполнением задания и на который он сможет если надо подписаться
                     RezultTask rez = new RezultTask(Tsk);
+
+                    // Устанавливаем время в которое поместили в очередь наше задание
+                    Tsk.PendingProcessing = DateTime.Now;
 
                     lock (_QueTaskWord)
                     {

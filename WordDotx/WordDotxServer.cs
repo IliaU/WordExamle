@@ -240,18 +240,18 @@ namespace WordDotx
             {
                 // Инициируем объект статистики
                 base.SetInitTableInWordAffected(Tsk, new RezultTaskAffectetdRow(Tab));
-                int FlagPart = 100; // какой промежуток строк через который нужно обновить стату для того чтобы не часто срабатывали события
-                int FlatPartTmp = FlagPart; // Текущее значение счётчика
+                //int FlagPart = 100; // какой промежуток строк через который нужно обновить стату для того чтобы не часто срабатывали события
+                //int FlatPartTmp = FlagPart; // Текущее значение счётчика
 
                 for (int i = 0; i < itemT.Rows.Count; i++)
                 {
                     // Правим статистику у последней таблицы
-                    if (FlatPartTmp > 0) FlatPartTmp--;
-                    else
-                    {
-                        base.SetTableInWordAffected(Tsk, itemT.Rows.Count);
-                        FlatPartTmp = FlagPart;
-                    }
+                    //if (FlatPartTmp > 0) FlatPartTmp--;
+                    //else
+                   // {
+                    //    FlatPartTmp = FlagPart;
+//                        base.SetTableInWordAffected(Tsk, i);
+                   // }
 
                     string FlagAddRow = null;
 
@@ -373,6 +373,9 @@ namespace WordDotx
                                 //itemT.Rows.Add(itemT.Cell(i + io + 1, 1).Row);
                                 // При этих вариантах падает с ошибкой Отсутствует доступ к отдельным строкам, поскольку таблица имеет ячейки, объединенные по вертикали. зато можно найти любой диапазон представить в виде строки и его добавить
                                 Doc.Range(itemT.Cell(i + io + 1, 1).Range.Start, itemT.Cell(i + io + 1, itemT.Columns.Count).Range.End).Rows.Add(Doc.Range(itemT.Cell(i + io + 1, 1).Range.Start, itemT.Cell(i + io + 1, itemT.Columns.Count).Range.End).Rows);
+
+                                // Обновляем статистику по таблице
+                                base.SetTableInWordAffected(Tsk, io+1);
 
                                 // пробегаем поячейкам походу так попадаем на нашу вставленную строку так как она вотнётся до той что копировали
                                 // foreach (Word.Cell item in itemT.Rows[i + 1].Cells)
