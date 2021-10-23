@@ -20,22 +20,20 @@ namespace WordDotx
         /// </summary>
         private static WordDotxServer _CurrentWordDotxServer;
 
-
-
         /// <summary>
         /// Папка по умолчанию для нашего файла с источником шаблонов
         /// </summary>
-        public static string _DefaultPathSource { get; private set; }
+        private static string _DefaultPathSource;
 
         /// <summary>
         /// Папка по умолчанию для нашего файла в который положим результат
         /// </summary>
-        public static string _DefaultPathTarget { get; private set; }
+        private static string _DefaultPathTarget;
 
         /// <summary>
         /// Поведение по умолчанию нужно заменить файл или нет
         /// </summary>
-        public static bool _DefReplaseFileTarget { get; private set; }
+        private static bool _DefReplaseFileTarget;
         #endregion
 
         #region  Public Param
@@ -77,14 +75,9 @@ namespace WordDotx
         }
 
         /// <summary>
-        /// Количество потоков наших серверов которые будут обрабатывать наши задания
-        /// </summary>
-        //public static int CountParralelPul = Environment.ProcessorCount;
-
-        /// <summary>
         /// Папка по умолчанию для нашего файла с источником шаблонов
         /// </summary>
-        public string DefaultPathSource
+        public static string DefaultPathSource
         {
             get
             {
@@ -96,7 +89,7 @@ namespace WordDotx
         /// <summary>
         /// Папка по умолчанию для нашего файла в который положим результат
         /// </summary>
-        public string DefaultPathTarget
+        public static string DefaultPathTarget
         {
             get
             {
@@ -108,7 +101,7 @@ namespace WordDotx
         /// <summary>
         /// Поведение по умолчанию нужно заменить файл или нет
         /// </summary>
-        public bool DefReplaseFileTarget
+        public static bool DefReplaseFileTarget
         {
             get
             {
@@ -139,6 +132,9 @@ namespace WordDotx
                 if (_CurrentWordDotxServer == null)
                 {
                     _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, DefReplaseFileTarget);
+                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
                 }
                 return _CurrentWordDotxServer;
             }
@@ -161,6 +157,9 @@ namespace WordDotx
                 if (_CurrentWordDotxServer == null)
                 {
                     _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, true);
+                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
                 }
                 return _CurrentWordDotxServer;
             }
@@ -182,6 +181,9 @@ namespace WordDotx
                 if (_CurrentWordDotxServer == null)
                 {
                     _CurrentWordDotxServer = new WordDotxServer(DefPathSorsAndTarget);
+                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
                 }
                 return _CurrentWordDotxServer;
             }
@@ -202,6 +204,9 @@ namespace WordDotx
                 if (_CurrentWordDotxServer == null)
                 {
                     _CurrentWordDotxServer = new WordDotxServer();
+                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
                 }
                 return _CurrentWordDotxServer;
             }

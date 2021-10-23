@@ -47,8 +47,9 @@ namespace WordDotx
             {
                 if (obj == null)
                 {
-                    this.DefaultPathSource = DefaultPathSource;
-                    this.DefaultPathTarget = DefaultPathTarget;
+                    // Если при создании сервера не указана папка по умолчанию то береём из Фарма
+                    this.DefaultPathSource = DefaultPathSource ?? FarmWordDotx.DefaultPathSource;
+                    this.DefaultPathTarget = DefaultPathTarget ?? FarmWordDotx.DefaultPathTarget;
                     this.DefReplaseFileTarget = DefReplaseFileTarget;
                     obj = this;
                 }

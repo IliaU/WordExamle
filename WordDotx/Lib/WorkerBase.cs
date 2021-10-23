@@ -97,7 +97,7 @@ namespace WordDotx.Lib
             try
             {
                 this.Index = -1;
-                this.WrdDotxSrv = new WordDotxServer(FarmWordDotx._DefaultPathSource, FarmWordDotx._DefaultPathTarget, FarmWordDotx._DefReplaseFileTarget);
+                this.WrdDotxSrv = new WordDotxServer(FarmWordDotx.DefaultPathSource, FarmWordDotx.DefaultPathTarget, FarmWordDotx.DefReplaseFileTarget);
             }
             catch (Exception ex)
             {
