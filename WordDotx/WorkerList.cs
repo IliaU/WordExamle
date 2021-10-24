@@ -249,7 +249,7 @@ namespace WordDotx
                 {
 
                     // Если текущее количество потоков меньше максимально возможного и если заданий больше чем текущее количество значит можно добавить поток и запустить его
-                    if (this.MaxCountThreadOfPull > 0 && FarmWordDotx.QueTaskWordCount > base.Count)
+                    if (this.MaxCountThreadOfPull > base.Count && FarmWordDotx.QueTaskWordCount > 0)
                     {
                         try
                         {
