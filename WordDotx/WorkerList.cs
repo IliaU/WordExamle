@@ -271,6 +271,11 @@ namespace WordDotx
                         catch (Exception ex)
                         {
                             // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                            if (this.onEvWorkerListError != null)
+                            {
+                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при добавлениии в пул работника",ex.Message));
+                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
+                            }
                         }
                     }
 
@@ -290,6 +295,11 @@ namespace WordDotx
                         catch (Exception ex)
                         {
                             // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                            if (this.onEvWorkerListError != null)
+                            {
+                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при остановке в пуле работника", ex.Message));
+                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
+                            }
                         }
                     }
 
@@ -308,6 +318,11 @@ namespace WordDotx
                         catch (Exception ex)
                         {
                             // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                            if (this.onEvWorkerListError != null)
+                            {
+                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при уничтожении в пуле работника", ex.Message));
+                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
+                            }
                         }
                     }
 
@@ -328,6 +343,11 @@ namespace WordDotx
                         catch (Exception ex)
                         {
                             // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                            if (this.onEvWorkerListError != null)
+                            {
+                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при лечении в пуле работника", ex.Message));
+                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
+                            }
                         }
                     }
 
