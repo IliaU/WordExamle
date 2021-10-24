@@ -249,10 +249,11 @@ namespace WordDotx
                 {
 
                     // Если текущее количество потоков меньше максимально возможного и если заданий больше чем текущее количество значит можно добавить поток и запустить его
-                    if (this.MaxCountThreadOfPull > base.Count && FarmWordDotx.QueTaskWordCount > 0)
+                    try
                     {
-                        try
+                        if (this.MaxCountThreadOfPull > base.Count && FarmWordDotx.QueTaskWordCount > 0)
                         {
+                        
                             // Если процесс ещё не остановлен
                             if (_HashRunning)
                             {
@@ -268,86 +269,66 @@ namespace WordDotx
                                 base.Add(wrk, true);
                             }
                         }
-                        catch (Exception ex)
+                    }
+                    catch (Exception ex)
+                    {
+                        // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                        if (this.onEvWorkerListError != null)
                         {
-                            // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
-                            if (this.onEvWorkerListError != null)
-                            {
-                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при добавлениии в пул работника",ex.Message));
-                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
-                            }
+                            EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при добавлениии в пул работника", ex.Message));
+                            this.onEvWorkerListError.Invoke(this, ArgErrorL);
                         }
                     }
 
                     // Если заданий меньше чем процессов то можно убить один из потоков но сначала отправляем команду стоп свободному процессу а при следующей итерации когда он остановится можно сделать Join и удалить процесс
-                    if (base.Count > 0 && FarmWordDotx.QueTaskWordCount < base.Count)
+                    try
                     {
-                        try
+                        if (base.Count > 0 && FarmWordDotx.QueTaskWordCount < base.Count)
                         {
+                        
                             //  берём последний в списке компонент
                             Lib.WorkerBase wrk = (Worker)base[base.Count - 1];
 
                             // Останавливаем в компонент чтобы он не брал больше новых заданий но не рубим его
-                            if(wrk.StatusWorker != EnStatusWorkercs.Stopping 
-                                && wrk.StatusWorker != EnStatusWorkercs.Stopped
-                                && wrk.StatusWorker != EnStatusWorkercs.FatalError) wrk.Stop();
-                        }
-                        catch (Exception ex)
-                        {
-                            // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
-                            if (this.onEvWorkerListError != null)
-                            {
-                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при остановке в пуле работника", ex.Message));
-                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
-                            }
+                            if(wrk.StatusWorker == EnStatusWorkercs.Waiting) wrk.Stop();
                         }
                     }
-
-                    // Если есть компоненты и последний компонент в статусе остановлен значит его можно убить ждём завершения его работы и убиваем его
-                    if (base.Count > 0 && FarmWordDotx.QueTaskWordCount < base.Count &&  
-                        (base[base.Count - 1].StatusWorker == EnStatusWorkercs.Stopped 
-                        || base[base.Count - 1].StatusWorker == EnStatusWorkercs.FatalError))
+                    catch (Exception ex)
                     {
-                        try
+                        // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                        if (this.onEvWorkerListError != null)
                         {
-
-                            Lib.WorkerBase wrk = (Worker)base[base.Count - 1];
-                            wrk.Join();
-                            base.Remove(wrk, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
-                            if (this.onEvWorkerListError != null)
-                            {
-                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при уничтожении в пуле работника", ex.Message));
-                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
-                            }
+                            EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при остановке в пуле работника", ex.Message));
+                            this.onEvWorkerListError.Invoke(this, ArgErrorL);
                         }
                     }
-
+                                        
                     // производим лечение потоков если упал какой-то из потоков то пробуем его уничтожить чтобы создался девственно чистый поток
-                    for (int i = 0; i < base.Count; i++)
+                    try
                     {
-                        try
+                        for (int i = 0; i < base.Count; i++)
                         {
                             Lib.WorkerBase wrk = base[i];
 
                             // Если поток упал но он не требует уничтожения потока при выключении то можно попробовать его уничтожить чтобы создался новый девственный поток
                             if (!wrk.HashRunning && wrk.StatusWorker == EnStatusWorkercs.Stopped)
                             {
+                                wrk.Stop();
+
                                 wrk.Join();
-                                base.Remove(wrk, true);
+
+                                base.Remove(wrk, true); 
                             }
+                        
                         }
-                        catch (Exception ex)
+                    }
+                    catch (Exception ex)
+                    {
+                        // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
+                        if (this.onEvWorkerListError != null)
                         {
-                            // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
-                            if (this.onEvWorkerListError != null)
-                            {
-                                EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при лечении в пуле работника", ex.Message));
-                                this.onEvWorkerListError.Invoke(this, ArgErrorL);
-                            }
+                            EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при лечении в пуле работника", ex.Message));
+                            this.onEvWorkerListError.Invoke(this, ArgErrorL);
                         }
                     }
 

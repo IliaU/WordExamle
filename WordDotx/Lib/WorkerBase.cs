@@ -110,7 +110,7 @@ namespace WordDotx.Lib
                     // Проверем на то что выполняет сейчас процесс какое нибудь задание или нет
                     if (Thr != null) throw new ApplicationException("Не возможно запустить процесс так как он выполняет другую задачу.");
 
-                    this.StatusWorker = EnStatusWorkercs.Waiting;
+                    this.StatusWorker = EnStatusWorkercs.Running;
 
                     //new ThreadStart(TaskThread.Run)
                     Thr = new Thread(Run);
@@ -241,12 +241,19 @@ namespace WordDotx.Lib
                                 this.onEvTaskWordError.Invoke(this, ArgError);
                             }
                         }
-
-                        this.StatusWorker = EnStatusWorkercs.Waiting;
                     }
 
                     // Если небыло команды по остановке  потока и если заданий нет то пауза
-                    if (_HashRunning && this.TaskWrk == null) Thread.Sleep(FarmWordDotx.TimeoutForWorkerSec * 1000);
+                    if (_HashRunning && this.TaskWrk == null)
+                    {
+                        this.StatusWorker = EnStatusWorkercs.Waiting;
+
+                        Thread.Sleep(FarmWordDotx.TimeoutForWorkerSec * 1000);
+
+                        // Типо опять процесс в работе чтобы пулл не остановил его
+                        this.StatusWorker = EnStatusWorkercs.Running;
+                        Thread.Sleep(500);
+                    }
                 }
                 this.StatusWorker = EnStatusWorkercs.Stopped;
             }

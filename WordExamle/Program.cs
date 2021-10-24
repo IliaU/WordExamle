@@ -107,6 +107,58 @@ namespace WordExamle
             // Небольшая пауза чтобы успел завестись парралельный поток в реальной жизни не нужно так как кгда останавливаем мы не хотим дожидаться завершения всех потоков
             Thread.Sleep(1000);
 
+
+/*
+
+            // Создаём список закладок
+            BookmarkList BmL = new BookmarkList();
+            Bookmark Bm = new Bookmark("Z1", "НОВЫЙ ТЕКСТ");
+            BmL.Add(Bm, true);
+
+            // Создаём таблицу с которой потом будем работать
+            TableList TabL = new TableList();
+            // Создаём временную таблицу
+            DataTable TabTmp = new DataTable();
+            TabTmp.Columns.Add(new DataColumn("A", typeof(string)));
+            TabTmp.Columns.Add(new DataColumn("B", typeof(string)));
+            TabTmp.Columns.Add(new DataColumn("C", typeof(string)));
+            DataRow nrow = TabTmp.NewRow();
+            nrow["A"] = "A1";
+            nrow["B"] = "B1";
+            nrow["C"] = "C1";
+            TabTmp.Rows.Add(nrow);
+            nrow = TabTmp.NewRow();
+            nrow["A"] = "A2";
+            nrow["B"] = "B2";
+            nrow["C"] = "C2";
+            TabTmp.Rows.Add(nrow);
+            nrow = TabTmp.NewRow();
+            nrow["A"] = "A3";
+            nrow["B"] = "B3";
+            nrow["C"] = "C3";
+            // Добавлем эту таблицу в наш класс
+            TabTmp.Rows.Add(nrow);
+            Table Tab = new Table("Tab", TabTmp);
+            TabL.Add(Tab, true);
+
+            // Добавляем тоталов в нашу таблицу
+            Tab.TtlList.Add(new Total("Total0", "Итог по Total0---"), false);
+            Tab.TtlList.Add(new Total("Total1", "Итог по Total1---"), false);
+            Tab.TtlList.Add(new Total("Total2", "Итог по Total2---"), false);
+            Tab.TtlList.Add(new Total("Total3", "Итог по Total3---"), false);
+
+
+
+
+            // Создаём задание
+            TaskWord Tsk1 = new TaskWord(Environment.CurrentDirectory.Replace(@"WordExamle\bin\Debug", @"Шаблон.dotx"), Environment.CurrentDirectory.Replace(@"WordExamle\bin\Debug", @"Результат.doc"), BmL, TabL, true);
+
+            // Добавляем задание в очередь
+            RezultTask rez1 = FarmWordDotx.QueTaskWordAdd(Tsk1);
+
+
+            Thread.Sleep(300000);
+            */
             // Можно смотреть что сейчас выполняется и получать стату по задачам которые сейчас в процессе
             List<TaskWord> TskL = FarmWordDotx.PoolWorkerList.GetTaskWordList();
 
