@@ -47,6 +47,7 @@
     <Compile Include="BookmarkList.cs" />
     <Compile Include="Bookmarks.cs" />
     <Compile Include="EnStatusTask.cs" />
+    <Compile Include="EnStatusWorkercs.cs" />
     <Compile Include="EvTaskWordEnd.cs" />
     <Compile Include="EvTaskWordError.cs" />
     <Compile Include="EvTaskWordStart.cs" />

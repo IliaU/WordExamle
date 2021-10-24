@@ -47,17 +47,9 @@ namespace WordDotx.Lib
         public int Index { get; private set; }
 
         /// <summary>
-        /// Можно ли процесс убить. Например если он ещё не стартовал или он всё выполнил
+        /// Статус в котором может находиться работник
         /// </summary>
-        public bool HashDistruct
-        {
-            get
-            {
-                if (this.Thr == null) return false;
-                else return true;
-            }
-            private set { }
-        }
+        public EnStatusWorkercs StatusWorker { get; private set; }
 
         /// <summary>
         /// Орьект который показывает работает процесс или нет
@@ -96,6 +88,7 @@ namespace WordDotx.Lib
         {
             try
             {
+                this.StatusWorker = EnStatusWorkercs.Created;
                 this.Index = -1;
                 this.WrdDotxSrv = new WordDotxServer(FarmWordDotx.DefaultPathSource, FarmWordDotx.DefaultPathTarget, FarmWordDotx.DefReplaseFileTarget);
             }
@@ -116,6 +109,8 @@ namespace WordDotx.Lib
                 {
                     // Проверем на то что выполняет сейчас процесс какое нибудь задание или нет
                     if (Thr != null) throw new ApplicationException("Не возможно запустить процесс так как он выполняет другую задачу.");
+
+                    this.StatusWorker = EnStatusWorkercs.Waiting;
 
                     //new ThreadStart(TaskThread.Run)
                     Thr = new Thread(Run);
@@ -147,6 +142,7 @@ namespace WordDotx.Lib
                 lock (Lok)
                 {
                     _HashRunning = false;
+                    this.StatusWorker = EnStatusWorkercs.Stopping;
                 }
             }
             catch (Exception ex)
@@ -203,13 +199,14 @@ namespace WordDotx.Lib
                     // Если есть задание
                     if (this.TaskWrk != null)
                     {
+                        this.StatusWorker = EnStatusWorkercs.Running;
+
                         // Проверяем подписку если пользователь подписан на это событие передаём ему управление на время
                         if (this.onEvTaskWordStart != null)
                         {
                             EvTaskWordStart ArgStart = new EvTaskWordStart(this.TaskWrk, this.WrdDotxSrv);
                             this.onEvTaskWordStart.Invoke(this, ArgStart);
                         }
-
 
                         // Получаем объект с результатом для того чтобы можно было его править и передавать результаты пользователю
                         // Например пользователь либо сам проверяет события периодически в нашем классе либо сможет подписаться на события в буле и получать результат непосредственно по событию
@@ -244,18 +241,19 @@ namespace WordDotx.Lib
                                 this.onEvTaskWordError.Invoke(this, ArgError);
                             }
                         }
+
+                        this.StatusWorker = EnStatusWorkercs.Waiting;
                     }
 
                     // Если небыло команды по остановке  потока и если заданий нет то пауза
                     if (_HashRunning && this.TaskWrk == null) Thread.Sleep(FarmWordDotx.TimeoutForWorkerSec * 1000);
                 }
+                this.StatusWorker = EnStatusWorkercs.Stopped;
             }
             catch (Exception ex)
             {
-                lock (Lok)
-                {
-                    _HashRunning = false;
-                }
+                _HashRunning = false;
+                this.StatusWorker = EnStatusWorkercs.FatalError;
 
                 if (this.onEvWorkerBaseError != null)
                 {

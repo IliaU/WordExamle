@@ -272,11 +272,10 @@ namespace WordDotx
                         {
                             // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
                         }
-
                     }
 
                     // Если заданий меньше чем процессов то можно убить один из потоков но сначала отправляем команду стоп свободному процессу а при следующей итерации когда он остановится можно сделать Join и удалить процесс
-                    if (FarmWordDotx.QueTaskWordCount < base.Count && base.Count > 0)
+                    if (base.Count > 0 && FarmWordDotx.QueTaskWordCount < base.Count)
                     {
                         try
                         {
@@ -284,7 +283,9 @@ namespace WordDotx
                             Lib.WorkerBase wrk = (Worker)base[base.Count - 1];
 
                             // Останавливаем в компонент чтобы он не брал больше новых заданий но не рубим его
-                            wrk.Stop();
+                            if(wrk.StatusWorker != EnStatusWorkercs.Stopping 
+                                && wrk.StatusWorker != EnStatusWorkercs.Stopped
+                                && wrk.StatusWorker != EnStatusWorkercs.FatalError) wrk.Stop();
                         }
                         catch (Exception ex)
                         {
@@ -293,14 +294,16 @@ namespace WordDotx
                     }
 
                     // Если есть компоненты и последний компонент в статусе остановлен значит его можно убить ждём завершения его работы и убиваем его
-                    if (FarmWordDotx.QueTaskWordCount > 0 && base.Count > 0 && !base[base.Count - 1].HashRunning)
+                    if (base.Count > 0 && FarmWordDotx.QueTaskWordCount < base.Count &&  
+                        (base[base.Count - 1].StatusWorker == EnStatusWorkercs.Stopped 
+                        || base[base.Count - 1].StatusWorker == EnStatusWorkercs.FatalError))
                     {
                         try
                         {
 
                             Lib.WorkerBase wrk = (Worker)base[base.Count - 1];
                             wrk.Join();
-                            if (wrk.HashDistruct) base.Remove(wrk, true);
+                            base.Remove(wrk, true);
                         }
                         catch (Exception ex)
                         {
@@ -316,10 +319,10 @@ namespace WordDotx
                             Lib.WorkerBase wrk = base[i];
 
                             // Если поток упал но он не требует уничтожения потока при выключении то можно попробовать его уничтожить чтобы создался новый девственный поток
-                            if (!wrk.HashRunning && !wrk.HashDistruct)
+                            if (!wrk.HashRunning && wrk.StatusWorker == EnStatusWorkercs.Stopped)
                             {
                                 wrk.Join();
-                                if (wrk.HashDistruct) base.Remove(wrk, true);
+                                base.Remove(wrk, true);
                             }
                         }
                         catch (Exception ex)
