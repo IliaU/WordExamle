@@ -12,6 +12,11 @@ namespace WordDotx.Lib
     public abstract class TaskWordBase
     {
         /// <summary>
+        /// Идентификатор задания
+        /// </summary>
+        public Guid Sid { get; private set; }
+
+        /// <summary>
         /// Если на основе задания был сделан результат то ссылка на этот результат присваивается в самом задании
         /// </summary>
         protected RezultTaskBase RezTsk;
@@ -30,8 +35,7 @@ namespace WordDotx.Lib
         /// Список таблиц который будем использовать
         /// </summary>
         public TableList TblL { get; private set; }
-
-
+        
         /// <summary>
         /// Реальное создание задания
         /// </summary>
@@ -59,6 +63,7 @@ namespace WordDotx.Lib
         {
             try
             {
+                this.Sid = Guid.NewGuid();
                 this.CraeteDt = DateTime.Now;
                 this.StatusTask = EnStatusTask.None;
                 this.StatusMessage = new List<string>();
