@@ -12,13 +12,14 @@ namespace WordDotx
     /// <summary>
     /// Класс для создание сервераобработки документов
     /// </summary>
-    public class FarmWordDotx : Lib.TaskWordBase.FarmWordDotxBase
+    public class FarmExcel : Lib.TaskExcelBase.FarmExcelBase
     {
+
         #region  Private Param
         /// <summary>
         /// Внутренний объект нашего Сервера когда сервер должен быть единственным в нашем приложении
         /// </summary>
-        private static WordDotxServer _CurrentWordDotxServer;
+        private static ExcelServer _CurrentExcelServer;
 
         /// <summary>
         /// Папка по умолчанию для нашего файла с источником шаблонов
@@ -40,11 +41,11 @@ namespace WordDotx
         /// <summary>
         /// Текущий  объект нашего Сервера когда сервер должен быть единственным в нашем приложении
         /// </summary>
-        public static WordDotxServer CurrentWordDotxServer
+        public static ExcelServer CurrentExcelServer
         {
             get
             {
-                return _CurrentWordDotxServer;
+                return _CurrentExcelServer;
             }
             private set { }
         }
@@ -113,7 +114,7 @@ namespace WordDotx
         /// <summary>
         /// Пул который обеспечивает парралельную обработку сразу нескольких заданий
         /// </summary>
-        public static WorkerWordList PoolWorkerList = new WorkerWordList();
+        public static WorkerExcelList PoolWorkerList = new WorkerExcelList();
 
         #endregion
 
@@ -125,22 +126,22 @@ namespace WordDotx
         /// <param name="DefaultPathTarget">Папка по умолчанию для нашего файла в который положим результат</param>
         /// <param name="DefReplaseFileTarget">Поведение по умолчанию нужно заменить файл или нет</param>
         /// <returns>Возвращет наш сервер который будет обрабатывать отчёты</returns>
-        public static WordDotxServer CreateWordDotxServer(string DefaultPathSource, string DefaultPathTarget, bool DefReplaseFileTarget)
+        public static ExcelServer CreateExcelServer(string DefaultPathSource, string DefaultPathTarget, bool DefReplaseFileTarget)
         {
             try
             {
-                if (_CurrentWordDotxServer == null)
+                if (_CurrentExcelServer == null)
                 {
-                    _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, DefReplaseFileTarget);
-                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
-                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
-                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
+                    _CurrentExcelServer = new ExcelServer(DefaultPathSource, DefaultPathTarget, DefReplaseFileTarget);
+                    _DefaultPathSource = CurrentExcelServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentExcelServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentExcelServer.DefReplaseFileTarget;
                 }
-                return _CurrentWordDotxServer;
+                return _CurrentExcelServer;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(string.Format("{0}.FarmWordDotx   Упали с ошибкой при создании сервера: ({1})", "FarmWordDotx", ex.Message));
+                throw new ApplicationException(string.Format("{0}.FarmExcel   Упали с ошибкой при создании сервера: ({1})", "FarmExcel", ex.Message));
             }
         }
 
@@ -150,22 +151,22 @@ namespace WordDotx
         /// <param name="DefaultPathSource">Папка по умолчанию для нашего файла с источником шаблонов</param>
         /// <param name="DefaultPathTarget">Папка по умолчанию для нашего файла в который положим результат</param>
         /// <returns>Возвращет наш сервер который будет обрабатывать отчёты</returns>
-        public static WordDotxServer CreateWordDotxServer(string DefaultPathSource, string DefaultPathTarget)
+        public static ExcelServer CreateExcelServer(string DefaultPathSource, string DefaultPathTarget)
         {
             try
             {
-                if (_CurrentWordDotxServer == null)
+                if (_CurrentExcelServer == null)
                 {
-                    _CurrentWordDotxServer = new WordDotxServer(DefaultPathSource, DefaultPathTarget, true);
-                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
-                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
-                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
+                    _CurrentExcelServer = new ExcelServer(DefaultPathSource, DefaultPathTarget, true);
+                    _DefaultPathSource = CurrentExcelServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentExcelServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentExcelServer.DefReplaseFileTarget;
                 }
-                return _CurrentWordDotxServer;
+                return _CurrentExcelServer;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(string.Format("{0}.FarmWordDotx   Упали с ошибкой при создании сервера: ({1})", "FarmWordDotx", ex.Message));
+                throw new ApplicationException(string.Format("{0}.FarmExcel   Упали с ошибкой при создании сервера: ({1})", "FarmExcel", ex.Message));
             }
         }
 
@@ -174,22 +175,22 @@ namespace WordDotx
         /// </summary>
         /// <param name="DefPathSorsAndTarget">Если путь один и для входящих файлов и исходящих</param>
         /// <returns>Возвращет наш сервер который будет обрабатывать отчёты</returns>
-        public static WordDotxServer CreateWordDotxServer(string DefPathSorsAndTarget)
+        public static ExcelServer CreateExcelServer(string DefPathSorsAndTarget)
         {
             try
             {
-                if (_CurrentWordDotxServer == null)
+                if (_CurrentExcelServer == null)
                 {
-                    _CurrentWordDotxServer = new WordDotxServer(DefPathSorsAndTarget);
-                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
-                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
-                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
+                    _CurrentExcelServer = new ExcelServer(DefPathSorsAndTarget);
+                    _DefaultPathSource = CurrentExcelServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentExcelServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentExcelServer.DefReplaseFileTarget;
                 }
-                return _CurrentWordDotxServer;
+                return _CurrentExcelServer;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(string.Format("{0}.FarmWordDotx   Упали с ошибкой при создании сервера: ({1})", "FarmWordDotx", ex.Message));
+                throw new ApplicationException(string.Format("{0}.FarmExcel   Упали с ошибкой при создании сервера: ({1})", "FarmExcel", ex.Message));
             }
         }
 
@@ -197,27 +198,26 @@ namespace WordDotx
         /// Создание сервера который будет обрабатывать наши объекты ворда в эдиничном экземпляре
         /// </summary>
         /// <returns>Возвращет наш сервер который будет обрабатывать отчёты</returns>
-        public static WordDotxServer CreateWordDotxServer()
+        public static ExcelServer CreateExcelServer()
         {
             try
             {
-                if (_CurrentWordDotxServer == null)
+                if (_CurrentExcelServer == null)
                 {
-                    _CurrentWordDotxServer = new WordDotxServer();
-                    _DefaultPathSource = CurrentWordDotxServer.DefaultPathSource;
-                    _DefaultPathTarget = CurrentWordDotxServer.DefaultPathTarget;
-                    _DefReplaseFileTarget = CurrentWordDotxServer.DefReplaseFileTarget;
+                    _CurrentExcelServer = new ExcelServer();
+                    _DefaultPathSource = CurrentExcelServer.DefaultPathSource;
+                    _DefaultPathTarget = CurrentExcelServer.DefaultPathTarget;
+                    _DefReplaseFileTarget = CurrentExcelServer.DefReplaseFileTarget;
                 }
-                return _CurrentWordDotxServer;
+                return _CurrentExcelServer;
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(string.Format("{0}.FarmWordDotx   Упали с ошибкой при создании сервера: ({1})", "FarmWordDotx", ex.Message));
+                throw new ApplicationException(string.Format("{0}.FarmExcel   Упали с ошибкой при создании сервера: ({1})", "FarmExcel", ex.Message));
             }
         }
 
-        
-        #endregion
 
+        #endregion
     }
 }

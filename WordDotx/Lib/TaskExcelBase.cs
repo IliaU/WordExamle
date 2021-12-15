@@ -9,7 +9,7 @@ namespace WordDotx.Lib
     /// <summary>
     /// Базовый класс для заданий которые могут выполнять задания из очереди асинхронно
     /// </summary>
-    public abstract class TaskWordBase
+    public abstract class TaskExcelBase
     {
         /// <summary>
         /// Идентификатор задания
@@ -35,7 +35,7 @@ namespace WordDotx.Lib
         /// Список таблиц который будем использовать
         /// </summary>
         public TableList TblL { get; private set; }
-        
+
         /// <summary>
         /// Реальное создание задания
         /// </summary>
@@ -59,7 +59,7 @@ namespace WordDotx.Lib
         /// <summary>
         /// Конструктор
         /// </summary>
-        public TaskWordBase(TableList TblL)
+        public TaskExcelBase(TableList TblL)
         {
             try
             {
@@ -99,18 +99,18 @@ namespace WordDotx.Lib
             /// <summary>
             /// Задание которое выполняется и за результатом которого мы следим
             /// </summary>
-            public TaskWordBase Tsk { get; private set; }
+            public TaskExcelBase Tsk { get; private set; }
 
             /// <summary>
             /// Список по каждой таблице внутри шаблона (их может быть больше чем в источнике и количество строк которое уже в каждой из них залито)
             /// </summary>
-            public List<RezultTaskAffectetdRow> TableInWordAffectedRowList { get; private set; }
+            public List<RezultTaskAffectetdRow> TableInExcelAffectedRowList { get; private set; }
 
             /// <summary>
             /// Конструктор который позволяет при создании связать результат с заданием для того чтобы потом отслеживать его
             /// </summary>
             /// <param name="Tsk">Задание к которому нужно привязать создаваемый класс который будет иметь доступ к закрытым полям для прогресс бара</param>
-            public RezultTaskBase(TaskWordBase Tsk)
+            public RezultTaskBase(TaskExcelBase Tsk)
             {
                 try
                 {
@@ -118,8 +118,8 @@ namespace WordDotx.Lib
                     this.Tsk = Tsk;
                     Tsk.RezTsk = this;
 
-                    // Создаём пустой список с таблицами по которым будем выводить статистику из ворда
-                    this.TableInWordAffectedRowList = new List<RezultTaskAffectetdRow>();
+                    // Создаём пустой список с таблицами по которым будем выводить статистику из Excel
+                    this.TableInExcelAffectedRowList = new List<RezultTaskAffectetdRow>();
 
                     // Если мы хотим получить класс который наблюдает за результатом значит мы будем выполнять асинхронно, тогда пока задания нет в очереди мы просто поменяем статус
                     this.Tsk.StatusTask = EnStatusTask.Empty;
@@ -133,12 +133,12 @@ namespace WordDotx.Lib
             /// <summary>
             /// Базовый класс для сервера чтобы он мог влиять на поля задания и прогресс бар задания
             /// </summary>
-            public abstract class WordDotxServerBase
+            public abstract class ExcelServerBase
             {
                 /// <summary>
                 /// Конструктор
                 /// </summary>
-                public WordDotxServerBase()
+                public ExcelServerBase()
                 {
                     try
                     {
@@ -155,7 +155,7 @@ namespace WordDotx.Lib
                 /// </summary>
                 /// <param name="Tsk">Задание которое попадает в очередь</param>
                 /// <param name="Stat">Статус который надо выставить</param>
-                protected void SetStatusTaskWord(TaskWordBase Tsk, EnStatusTask Stat)
+                protected void SetStatusTaskExcel(TaskExcelBase Tsk, EnStatusTask Stat)
                 {
                     try
                     {
@@ -178,7 +178,7 @@ namespace WordDotx.Lib
                     }
                     catch (Exception ex)
                     {
-                        throw new ApplicationException(string.Format("{0}.SetStatusTaskWord  При установки нового статуса упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
+                        throw new ApplicationException(string.Format("{0}.SetStatusTaskExcel  При установки нового статуса упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
                     }
                 }
 
@@ -187,7 +187,7 @@ namespace WordDotx.Lib
                 /// </summary>
                 /// <param name="Tsk">Задание которое обрабатываем</param>
                 /// <param name="mes">Сообщение которое нужно добавить</param>
-                protected void SetStatusMessage(TaskWordBase Tsk, string mes)
+                protected void SetStatusMessage(TaskExcelBase Tsk, string mes)
                 {
                     try
                     {
@@ -200,21 +200,21 @@ namespace WordDotx.Lib
                 }
 
                 /// <summary>
-                /// Добавление в статистику имнформации по первоначальной обработке нашей таблицы из ворда
+                /// Добавление в статистику имнформации по первоначальной обработке нашей таблицы из Excel
                 /// </summary>
                 /// <param name="Tsk">Задание в рамках которого происходит добавление задания в лист</param>
                 /// <param name="StatTblRow">Создаём объект который потом будем просматривать</param>
-                protected void SetInitTableInWordAffected(TaskWordBase Tsk, RezultTaskAffectetdRow StatTblRow)
+                protected void SetInitTableInExcelAffected(TaskExcelBase Tsk, RezultTaskAffectetdRow StatTblRow)
                 {
                     try
                     {
                         if (StatTblRow != null)
                         {
-                            if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInWordAffectedRowList != null)
+                            if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInExcelAffectedRowList != null)
                             {
-                                lock (Tsk.RezTsk.TableInWordAffectedRowList)
+                                lock (Tsk.RezTsk.TableInExcelAffectedRowList)
                                 {
-                                    Tsk.RezTsk.TableInWordAffectedRowList.Add(StatTblRow);
+                                    Tsk.RezTsk.TableInExcelAffectedRowList.Add(StatTblRow);
                                 }
                             }
                         }
@@ -226,25 +226,25 @@ namespace WordDotx.Lib
                 }
 
                 /// <summary>
-                /// Добавление в статистику имнформации по первоначальной обработке нашей таблицы из ворда
+                /// Добавление в статистику имнформации по первоначальной обработке нашей таблицы из Excel
                 /// </summary>
                 /// <param name="Tsk">Задание в рамках которого происходит добавление задания в лист</param>
                 /// <param name="AffectedRow">Устанавливаем текущее кол-во строк которое уже обработали</param>
-                protected void SetTableInWordAffected(TaskWordBase Tsk, int AffectedRow)
+                protected void SetTableInExcelAffected(TaskExcelBase Tsk, int AffectedRow)
                 {
                     try
                     {
-                        if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInWordAffectedRowList != null && Tsk.RezTsk.TableInWordAffectedRowList.Count > 0)
+                        if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInExcelAffectedRowList != null && Tsk.RezTsk.TableInExcelAffectedRowList.Count > 0)
                         {
-                            lock (Tsk.RezTsk.TableInWordAffectedRowList)
+                            lock (Tsk.RezTsk.TableInExcelAffectedRowList)
                             {
                                 int FlagMaxIndex = 0;
-                                for (int i = 0; i < Tsk.RezTsk.TableInWordAffectedRowList.Count; i++)
+                                for (int i = 0; i < Tsk.RezTsk.TableInExcelAffectedRowList.Count; i++)
                                 {
-                                    if (!Tsk.RezTsk.TableInWordAffectedRowList[i].HashEnd) FlagMaxIndex = i;
+                                    if (!Tsk.RezTsk.TableInExcelAffectedRowList[i].HashEnd) FlagMaxIndex = i;
                                 }
 
-                                Tsk.RezTsk.TableInWordAffectedRowList[FlagMaxIndex].AffectedRow = AffectedRow;
+                                Tsk.RezTsk.TableInExcelAffectedRowList[FlagMaxIndex].AffectedRow = AffectedRow;
                             }
                         }
                     }
@@ -256,26 +256,26 @@ namespace WordDotx.Lib
 
 
                 /// <summary>
-                /// Добавление в статистику имнформации по первоначальной обработке нашей таблицы из ворда
+                /// Добавление в статистику имнформации по первоначальной обработке нашей таблицы из Excel
                 /// </summary>
                 /// <param name="Tsk">Задание в рамках которого происходит добавление задания в лист</param>
                 /// <param name="AffectedRow">Устанавливаем текущее кол-во строк которое уже обработали</param>
-                protected void SetEndTableInWordAffected(TaskWordBase Tsk, int AffectedRow)
+                protected void SetEndTableInExcelAffected(TaskExcelBase Tsk, int AffectedRow)
                 {
                     try
                     {
-                        if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInWordAffectedRowList != null && Tsk.RezTsk.TableInWordAffectedRowList.Count > 0)
+                        if (Tsk != null && Tsk.RezTsk != null && Tsk.RezTsk.TableInExcelAffectedRowList != null && Tsk.RezTsk.TableInExcelAffectedRowList.Count > 0)
                         {
-                            lock (Tsk.RezTsk.TableInWordAffectedRowList)
+                            lock (Tsk.RezTsk.TableInExcelAffectedRowList)
                             {
                                 int FlagMaxIndex = 0;
-                                for (int i = 0; i < Tsk.RezTsk.TableInWordAffectedRowList.Count; i++)
+                                for (int i = 0; i < Tsk.RezTsk.TableInExcelAffectedRowList.Count; i++)
                                 {
-                                    if (!Tsk.RezTsk.TableInWordAffectedRowList[i].HashEnd) FlagMaxIndex = i;
+                                    if (!Tsk.RezTsk.TableInExcelAffectedRowList[i].HashEnd) FlagMaxIndex = i;
                                 }
 
-                                Tsk.RezTsk.TableInWordAffectedRowList[FlagMaxIndex].AffectedRow = AffectedRow;
-                                Tsk.RezTsk.TableInWordAffectedRowList[FlagMaxIndex].HashEnd = true;
+                                Tsk.RezTsk.TableInExcelAffectedRowList[FlagMaxIndex].AffectedRow = AffectedRow;
+                                Tsk.RezTsk.TableInExcelAffectedRowList[FlagMaxIndex].HashEnd = true;
                             }
                         }
                     }
@@ -290,25 +290,25 @@ namespace WordDotx.Lib
         /// <summary>
         /// Базовый класс для фермы чтобы мог менять статусу у нашего задания он же создаёт структуру очереди для потока который внутри
         /// </summary>
-        public abstract class FarmWordDotxBase
+        public abstract class FarmExcelBase
         {
 
             /// <summary>
             /// Очередь для наших документов которые будут обрабатываться нашей фермой
             /// </summary>
-            private static Queue<TaskWord> _QueTaskWord = new Queue<TaskWord>();
+            private static Queue<TaskExcel> _QueTaskExcel = new Queue<TaskExcel>();
 
             /// <summary>
             /// Кол-во объектов в очереди 
             /// </summary>
-            public static int QueTaskWordCount
+            public static int QueTaskExcelCount
             {
                 get
                 {
                     int rez = 0;
-                    lock (_QueTaskWord)
+                    lock (_QueTaskExcel)
                     {
-                        rez = _QueTaskWord.Count;
+                        rez = _QueTaskExcel.Count;
                     }
                     return rez;
                 }
@@ -325,19 +325,19 @@ namespace WordDotx.Lib
             /// </summary>
             /// <param name="Tsk">Задание которое нужно выполнить нашему серверу</param>
             /// <returns>едоставляет класс через который пользрватель сможет наблюдать за состоянием нашего задания</returns>
-            public static RezultTaskWord QueTaskWordAdd(TaskWord Tsk)
+            public static RezultTaskExcel QueTaskExcelAdd(TaskExcel Tsk)
             {
                 try
                 {
                     // Создаём класс через который пользователь будет наблюдать за выполнением задания и на который он сможет если надо подписаться
-                    RezultTaskWord rez = new RezultTaskWord(Tsk);
+                    RezultTaskExcel rez = new RezultTaskExcel(Tsk);
 
                     // Устанавливаем время в которое поместили в очередь наше задание
                     Tsk.PendingProcessing = DateTime.Now;
 
-                    lock (_QueTaskWord)
+                    lock (_QueTaskExcel)
                     {
-                        _QueTaskWord.Enqueue(Tsk);
+                        _QueTaskExcel.Enqueue(Tsk);
 
                         // Выставляем статус для того чтобы пользователь мог увидеть что задание уже в очереди
                         Tsk.StatusTask = EnStatusTask.Pending;
@@ -348,7 +348,7 @@ namespace WordDotx.Lib
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException(string.Format("{0}.QueTaskWordAdd   Упали с ошибкой при добавлении в очередь: ({1})", "FarmWordDotx", ex.Message));
+                    throw new ApplicationException(string.Format("{0}.QueTaskExcelAdd   Упали с ошибкой при добавлении в очередь: ({1})", "TaskExcel", ex.Message));
                 }
             }
 
@@ -356,17 +356,17 @@ namespace WordDotx.Lib
             /// Возвращет объект из очереди но не всем а только объетум Worker
             /// </summary>
             /// <returns>Задание которое стоит в очереди</returns>
-            private static TaskWord QueTaskWordGet()
+            private static TaskExcel QueTaskExcelGet()
             {
                 try
                 {
-                    if (_QueTaskWord == null) throw new ApplicationException("Не инициирован FARM по этому обраблотка асинхронная не возможна");
+                    if (_QueTaskExcel == null) throw new ApplicationException("Не инициирован FARM по этому обраблотка асинхронная не возможна");
 
-                    TaskWord rez = null;
+                    TaskExcel rez = null;
 
-                    lock (_QueTaskWord)
+                    lock (_QueTaskExcel)
                     {
-                        if (_QueTaskWord.Count > 0) rez = _QueTaskWord.Dequeue();
+                        if (_QueTaskExcel.Count > 0) rez = _QueTaskExcel.Dequeue();
                     }
 
                     // Возвращаемобъект пользователю
@@ -374,7 +374,7 @@ namespace WordDotx.Lib
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException(string.Format("{0}.QueTaskWordGet   Упали с ошибкой при извлечении объекта из очереди в очередь: ({1})", "FarmWordDotx", ex.Message));
+                    throw new ApplicationException(string.Format("{0}.QueTaskExcelGet   Упали с ошибкой при извлечении объекта из очереди в очередь: ({1})", "FarmExcel", ex.Message));
                 }
             }
 
@@ -387,16 +387,16 @@ namespace WordDotx.Lib
                 /// Получить задание из очереди
                 /// </summary>
                 /// <returns></returns>
-                protected TaskWord QueTaskWordGet()
+                protected TaskExcel QueTaskExcelGet()
                 {
                     try
                     {
                         // Возвращаемобъект пользователю
-                        return FarmWordDotx.QueTaskWordGet();
+                        return FarmExcel.QueTaskExcelGet();
                     }
                     catch (Exception ex)
                     {
-                        throw new ApplicationException(string.Format("{0}.QueTaskWordGet   Упали с ошибкой при извлечении объекта из очереди в очередь: ({1})", "FarmWordDotx", ex.Message));
+                        throw new ApplicationException(string.Format("{0}.QueTaskExcelGet   Упали с ошибкой при извлечении объекта из очереди в очередь: ({1})", "FarmExcel", ex.Message));
                     }
                 }
 
@@ -405,7 +405,7 @@ namespace WordDotx.Lib
                 /// </summary>
                 /// <param name="Tsk"></param>
                 /// <returns></returns>
-                protected RezultTaskBase GetRezult(TaskWord Tsk)
+                protected RezultTaskBase GetRezult(TaskExcel Tsk)
                 {
                     try
                     {
@@ -416,7 +416,7 @@ namespace WordDotx.Lib
                     }
                     catch (Exception ex)
                     {
-                        throw new ApplicationException(string.Format("{0}.GetRezult   Упали с ошибкой при извлечении объекта из очереди в очередь: ({1})", "FarmWordDotx", ex.Message));
+                        throw new ApplicationException(string.Format("{0}.GetRezult   Упали с ошибкой при извлечении объекта из очереди в очередь: ({1})", "FarmExcel", ex.Message));
                     }
                 }
 
@@ -425,7 +425,7 @@ namespace WordDotx.Lib
                 /// </summary>
                 /// <param name="Tsk">Задание которое попадает в очередь</param>
                 /// <param name="Stat">Статус который надо выставить</param>
-                protected void SetStatusTaskWord(TaskWordBase Tsk, EnStatusTask Stat)
+                protected void SetStatusTaskExcel(TaskExcelBase Tsk, EnStatusTask Stat)
                 {
                     try
                     {
@@ -433,7 +433,7 @@ namespace WordDotx.Lib
                     }
                     catch (Exception ex)
                     {
-                        throw new ApplicationException(string.Format("{0}.SetStatusTaskWord  При установки нового статуса упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
+                        throw new ApplicationException(string.Format("{0}.SetStatusTaskExcel  При установки нового статуса упали с ошибкой: ({1})", this.GetType().Name, ex.Message));
                     }
                 }
 
@@ -442,7 +442,7 @@ namespace WordDotx.Lib
                 /// </summary>
                 /// <param name="Tsk">Задание которое обрабатываем</param>
                 /// <param name="mes">Сообщение которое нужно добавить</param>
-                protected void SetStatusMessage(TaskWordBase Tsk, string mes)
+                protected void SetStatusMessage(TaskExcelBase Tsk, string mes)
                 {
                     try
                     {

@@ -11,7 +11,7 @@ namespace WordDotx
     /// <summary>
     /// Класс который представляет из себя бул работников и может выполнять рабуту асинхронно сразу в несколько парралелей
     /// </summary>
-    public class WorkerList : Lib.WorkerBase.WorkerListBase
+    public class WorkerWordList : Lib.WorkerWordBase.WorkerWordListBase
     {
         // Объект асинхронного процесса
         private Thread Thr;
@@ -64,18 +64,18 @@ namespace WordDotx
         /// <summary>
         /// Событие исключения которое возникло в работнике и он не может продолжать обрабатывать документы
         /// </summary>
-        public event EventHandler<EvWorkerError> onEvWorkerError;
+        public event EventHandler<EvWorkerWordError> onEvWorkerError;
 
         /// <summary>
         /// Событие исключения которое возникло в пуле и он не может продолжать обрабатывать документы
         /// </summary>
-        public event EventHandler<EvWorkerListError> onEvWorkerListError;
+        public event EventHandler<EvWorkerWordListError> onEvWorkerListError;
 
         /// <summary>
         /// Конструктор
         /// </summary>
         /// <param name="MaxCountThreadOfPull">Максимальное количество потоков которое нужно создавать в пуле</param>
-        public WorkerList(int MaxCountThreadOfPull)
+        public WorkerWordList(int MaxCountThreadOfPull)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace WordDotx
         /// <summary>
         /// Конструктор
         /// </summary>
-        public WorkerList() : this(Environment.ProcessorCount)
+        public WorkerWordList() : this(Environment.ProcessorCount)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace WordDotx
                     for (int i = 0; i < base.Count; i++)
                     {
                         // Вытаскиваем самого работника
-                        Worker wrk = (Worker)base[i];
+                        WorkerWord wrk = (WorkerWord)base[i];
 
                         // Получаем задание которое он сейчас обрабатывает
                         TaskWord Tsk = wrk.TaskWrk;
@@ -258,7 +258,7 @@ namespace WordDotx
                             if (_HashRunning)
                             {
                                 // Cоздаём поток серверный и запускаем его чтобы он сразу был в работе
-                                Worker wrk = new Worker();
+                                WorkerWord wrk = new WorkerWord();
                                 wrk.onEvTaskWordStart += Wrk_onEvTaskWordStart;
                                 wrk.onEvTaskWordEnd += Wrk_onEvTaskWordEnd;
                                 wrk.onEvTaskWordError += Wrk_onEvTaskWordError;
@@ -275,7 +275,7 @@ namespace WordDotx
                         // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
                         if (this.onEvWorkerListError != null)
                         {
-                            EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при добавлениии в пул работника", ex.Message));
+                            EvWorkerWordListError ArgErrorL = new EvWorkerWordListError(this, string.Format("Ошибка при добавлениии в пул работника", ex.Message));
                             this.onEvWorkerListError.Invoke(this, ArgErrorL);
                         }
                     }
@@ -287,7 +287,7 @@ namespace WordDotx
                         {
                         
                             //  берём последний в списке компонент
-                            Lib.WorkerBase wrk = (Worker)base[base.Count - 1];
+                            Lib.WorkerWordBase wrk = (WorkerWord)base[base.Count - 1];
 
                             // Останавливаем в компонент чтобы он не брал больше новых заданий но не рубим его
                             if(wrk.StatusWorker == EnStatusWorkercs.Waiting) wrk.Stop();
@@ -298,7 +298,7 @@ namespace WordDotx
                         // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
                         if (this.onEvWorkerListError != null)
                         {
-                            EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при остановке в пуле работника", ex.Message));
+                            EvWorkerWordListError ArgErrorL = new EvWorkerWordListError(this, string.Format("Ошибка при остановке в пуле работника", ex.Message));
                             this.onEvWorkerListError.Invoke(this, ArgErrorL);
                         }
                     }
@@ -308,7 +308,7 @@ namespace WordDotx
                     {
                         for (int i = 0; i < base.Count; i++)
                         {
-                            Lib.WorkerBase wrk = base[i];
+                            Lib.WorkerWordBase wrk = base[i];
 
                             // Если поток упал но он не требует уничтожения потока при выключении то можно попробовать его уничтожить чтобы создался новый девственный поток
                             if (!wrk.HashRunning && wrk.StatusWorker == EnStatusWorkercs.Stopped)
@@ -327,7 +327,7 @@ namespace WordDotx
                         // Передаём ошибку подписанному пользователю на событие но процесс не завершаем
                         if (this.onEvWorkerListError != null)
                         {
-                            EvWorkerListError ArgErrorL = new EvWorkerListError(this, string.Format("Ошибка при лечении в пуле работника", ex.Message));
+                            EvWorkerWordListError ArgErrorL = new EvWorkerWordListError(this, string.Format("Ошибка при лечении в пуле работника", ex.Message));
                             this.onEvWorkerListError.Invoke(this, ArgErrorL);
                         }
                     }
@@ -358,7 +358,7 @@ namespace WordDotx
                 // Подписка на события
                 if (this.onEvWorkerListError != null)
                 {
-                    EvWorkerListError ArgErrorL = new EvWorkerListError(this, ex.Message);
+                    EvWorkerWordListError ArgErrorL = new EvWorkerWordListError(this, ex.Message);
                     this.onEvWorkerListError.Invoke(this, ArgErrorL);
                 }
 
@@ -371,7 +371,7 @@ namespace WordDotx
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Wrk_onEvWorkerError(object sender, EvWorkerError e)
+        private void Wrk_onEvWorkerError(object sender, EvWorkerWordError e)
         {
             try
             {

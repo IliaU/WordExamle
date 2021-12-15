@@ -11,7 +11,7 @@ namespace WordDotx.Lib
     /// <summary>
     /// Класс который организует асинхронное выполнение заданий к WordDotxServer
     /// </summary>
-    public abstract class WorkerBase : TaskWordBase.FarmWordDotxBase.WorkerBaseInclude
+    public abstract class WorkerExcelBase : TaskExcelBase.FarmExcelBase.WorkerBaseInclude
     {
         // Объект асинхронного процесса
         private Thread Thr;
@@ -29,17 +29,17 @@ namespace WordDotx.Lib
         /// <summary>
         /// Сервер который будет обрабатывать запросы
         /// </summary>
-        protected WordDotxServer WrdDotxSrv { get; private set; }
+        protected ExcelServer ExlSrv { get; private set; }
 
         /// <summary>
         /// Ссылка на задание по которому идёт расчёт результата
         /// </summary>
-        protected TaskWord TaskWrk { get; private set; }
+        protected TaskExcel TaskExl { get; private set; }
 
         /// <summary>
         /// Событие исключения которое возникло в работнике и он не может продолжать обрабатывать документы
         /// </summary>
-        protected event EventHandler<EvWorkerBaseError> onEvWorkerBaseError;
+        protected event EventHandler<EvWorkerExcelBaseError> onEvWorkerExcelBaseError;
 
         /// <summary>
         /// Индекс элемента в списке
@@ -69,28 +69,28 @@ namespace WordDotx.Lib
         /// <summary>
         /// Событие запуска задания в работу
         /// </summary>
-        public event EventHandler<EvTaskWordStart> onEvTaskWordStart;
+        public event EventHandler<EvTaskExcelStart> onEvTaskExcelStart;
 
         /// <summary>
         /// Событие выполнения задания без ошибок
         /// </summary>
-        public event EventHandler<EvTaskWordEnd> onEvTaskWordEnd;
+        public event EventHandler<EvTaskExcelEnd> onEvTaskExcelEnd;
 
         /// <summary>
         /// Событие исключения при получении ошибки в задании
         /// </summary>
-        public event EventHandler<EvTaskWordError> onEvTaskWordError;
+        public event EventHandler<EvTaskExcelError> onEvTaskExcelError;
 
         /// <summary>
         /// Конструктор
         /// </summary>
-        public WorkerBase()
+        public WorkerExcelBase()
         {
             try
             {
                 this.StatusWorker = EnStatusWorkercs.Created;
                 this.Index = -1;
-                this.WrdDotxSrv = new WordDotxServer(FarmWordDotx.DefaultPathSource, FarmWordDotx.DefaultPathTarget, FarmWordDotx.DefReplaseFileTarget);
+                this.ExlSrv = new ExcelServer(FarmExcel.DefaultPathSource, FarmExcel.DefaultPathTarget, FarmExcel.DefReplaseFileTarget);
             }
             catch (Exception ex)
             {
@@ -115,7 +115,7 @@ namespace WordDotx.Lib
                     //new ThreadStart(TaskThread.Run)
                     Thr = new Thread(Run);
                     Thr.IsBackground = true;
-                    Thr.Name = string.Format("TaskWordBase {0}", this.Index);
+                    Thr.Name = string.Format("TaskExcelBase {0}", this.Index);
 
                     _HashRunning = true;
                 }
@@ -194,57 +194,57 @@ namespace WordDotx.Lib
                 while (_HashRunning)
                 {
                     // Получаем задание из общей очереди
-                    this.TaskWrk = base.QueTaskWordGet();
+                    this.TaskExl = base.QueTaskExcelGet();
 
                     // Если есть задание
-                    if (this.TaskWrk != null)
+                    if (this.TaskExl != null)
                     {
                         this.StatusWorker = EnStatusWorkercs.Running;
 
                         // Проверяем подписку если пользователь подписан на это событие передаём ему управление на время
-                        if (this.onEvTaskWordStart != null)
+                        if (this.onEvTaskExcelStart != null)
                         {
-                            EvTaskWordStart ArgStart = new EvTaskWordStart(this.TaskWrk, this.WrdDotxSrv);
-                            this.onEvTaskWordStart.Invoke(this, ArgStart);
+                            EvTaskExcelStart ArgStart = new EvTaskExcelStart(this.TaskExl, this.ExlSrv);
+                            this.onEvTaskExcelStart.Invoke(this, ArgStart);
                         }
 
                         // Получаем объект с результатом для того чтобы можно было его править и передавать результаты пользователю
                         // Например пользователь либо сам проверяет события периодически в нашем классе либо сможет подписаться на события в буле и получать результат непосредственно по событию
                         // В идеале уже со ссылкой на свой результат и  со ссылкой на задание
-                        TaskWordBase.RezultTaskBase RezTsk = base.GetRezult(this.TaskWrk);
+                        TaskExcelBase.RezultTaskBase RezTsk = base.GetRezult(this.TaskExl);
 
                         // оборачиваем наш запуск для того чтобы в случае ошибки поток не падал а вызывал потом событие и сообщил пользователю
                         try
                         {
                             // Меняем статус на запущенный чтобы сервер не руганулся на то что надо запукать задание асинхронно
-                            base.SetStatusTaskWord(this.TaskWrk, EnStatusTask.Running);
+                            base.SetStatusTaskExcel(this.TaskExl, EnStatusTask.Running);
 
                             // Запускаем обработку задания в нашем процессе
-                            WrdDotxSrv.StartCreateReport(this.TaskWrk);
+                            ExlSrv.StartCreateReport(this.TaskExl);
 
                             // Проверяем подписку если пользователь подписан на это событие передаём ему управление на время
-                            if (this.onEvTaskWordEnd != null)
+                            if (this.onEvTaskExcelEnd != null)
                             {
-                                EvTaskWordEnd ArgEnd = new EvTaskWordEnd(this.TaskWrk, this.WrdDotxSrv);
-                                this.onEvTaskWordEnd.Invoke(this, ArgEnd);
+                                EvTaskExcelEnd ArgEnd = new EvTaskExcelEnd(this.TaskExl, this.ExlSrv);
+                                this.onEvTaskExcelEnd.Invoke(this, ArgEnd);
                             }
                         }
                         catch (Exception ex)
                         {
                             // Ну и на последок можно записать ошибку в результат
-                            base.SetStatusTaskWord(this.TaskWrk, EnStatusTask.ERROR);
+                            base.SetStatusTaskExcel(this.TaskExl, EnStatusTask.ERROR);
 
                             // Проверяем подписку если пользователь подписан на это событие передаём ему управление на время
-                            if (this.onEvTaskWordError != null)
+                            if (this.onEvTaskExcelError != null)
                             {
-                                EvTaskWordError ArgError = new EvTaskWordError(this.TaskWrk, this.WrdDotxSrv, ex.Message);
-                                this.onEvTaskWordError.Invoke(this, ArgError);
+                                EvTaskExcelError ArgError = new EvTaskExcelError(this.TaskExl, this.ExlSrv, ex.Message);
+                                this.onEvTaskExcelError.Invoke(this, ArgError);
                             }
                         }
                     }
 
                     // Если небыло команды по остановке  потока и если заданий нет то пауза
-                    if (_HashRunning && this.TaskWrk == null)
+                    if (_HashRunning && this.TaskExl == null)
                     {
                         this.StatusWorker = EnStatusWorkercs.Waiting;
 
@@ -262,10 +262,10 @@ namespace WordDotx.Lib
                 _HashRunning = false;
                 this.StatusWorker = EnStatusWorkercs.FatalError;
 
-                if (this.onEvWorkerBaseError != null)
+                if (this.onEvWorkerExcelBaseError != null)
                 {
-                    EvWorkerBaseError ArgErrorW = new EvWorkerBaseError(this, ex.Message);
-                    this.onEvWorkerBaseError.Invoke(this, ArgErrorW);
+                    EvWorkerExcelBaseError ArgErrorW = new EvWorkerExcelBaseError(this, ex.Message);
+                    this.onEvWorkerExcelBaseError.Invoke(this, ArgErrorW);
                 }
 
                 throw new ApplicationException(string.Format("{0}.Run   Упали с ошибкой в потоке которй обслуживает сервис по формированию отчёта: ({1})", this.GetType().Name, ex.Message));
@@ -276,12 +276,12 @@ namespace WordDotx.Lib
         /// <summary>
         /// Базовый класс для нашего пулакоторый представляет из себя список но управление списком будет осуществлять ребёнок этого класса
         /// </summary>
-        public abstract class WorkerListBase : IEnumerable
+        public abstract class WorkerExcelListBase : IEnumerable
         {
             /// <summary>
             /// Внутренний список 
             /// </summary>
-            private List<WorkerBase> WrkL = new List<WorkerBase>();
+            private List<WorkerExcelBase> ExlL = new List<WorkerExcelBase>();
 
             /// <summary>
             /// Количчество объектов в контейнере
@@ -293,9 +293,9 @@ namespace WordDotx.Lib
                     try
                     {
                         int rez;
-                        lock (WrkL)
+                        lock (ExlL)
                         {
-                            rez = WrkL.Count;
+                            rez = ExlL.Count;
                         }
                         return rez;
                     }
@@ -310,19 +310,19 @@ namespace WordDotx.Lib
             /// <summary>
             /// Добавление нового элемента
             /// </summary>
-            /// <param name="newWrk">Элемент который нужно добавить в список</param>
+            /// <param name="newExl">Элемент который нужно добавить в список</param>
             /// <param name="HashExeption">C отображением исключений</param>
             /// <returns>Результат операции (Успех или нет)</returns>
-            protected bool Add(WorkerBase newWrk, bool HashExeption)
+            protected bool Add(WorkerExcelBase newExl, bool HashExeption)
             {
                 bool rez = false;
 
                 try
                 {
-                    lock (this.WrkL)
+                    lock (this.ExlL)
                     {
-                        newWrk.Index = WrkL.Count;
-                        this.WrkL.Add(newWrk);
+                        newExl.Index = ExlL.Count;
+                        this.ExlL.Add(newExl);
                         rez = true;
                     }
                 }
@@ -336,22 +336,22 @@ namespace WordDotx.Lib
             /// <summary>
             /// Удаление элемента
             /// </summary>
-            /// <param name="delWrk">Элемент который нужно удалить из списка</param>
+            /// <param name="delExl">Элемент который нужно удалить из списка</param>
             /// <param name="HashExeption">C отображением исключений</param>
             /// <returns>Результат операции (Успех или нет)</returns>
-            protected bool Remove(WorkerBase delWrk, bool HashExeption)
+            protected bool Remove(WorkerExcelBase delExl, bool HashExeption)
             {
                 bool rez = false;
                 try
                 {
-                    lock (this.WrkL)
+                    lock (this.ExlL)
                     {
-                        int delIndex = delWrk.Index;
-                        this.WrkL.RemoveAt(delIndex);
+                        int delIndex = delExl.Index;
+                        this.ExlL.RemoveAt(delIndex);
 
-                        for (int i = delIndex; i < this.WrkL.Count; i++)
+                        for (int i = delIndex; i < this.ExlL.Count; i++)
                         {
-                            this.WrkL[i].Index = i;
+                            this.ExlL[i].Index = i;
                         }
 
                         rez = true;
@@ -359,7 +359,7 @@ namespace WordDotx.Lib
                 }
                 catch (Exception ex)
                 {
-                    if (HashExeption) throw new ApplicationException(string.Format("Не удалось удалить элемент с мндексом {0} из списка. Произошла ошибка: {1}", delWrk.Index, ex.Message));
+                    if (HashExeption) throw new ApplicationException(string.Format("Не удалось удалить элемент с мндексом {0} из списка. Произошла ошибка: {1}", delExl.Index, ex.Message));
                 }
 
                 return rez;
@@ -371,16 +371,16 @@ namespace WordDotx.Lib
             /// </summary>
             /// <param name="i">Индекс элемента в массиве</param>
             /// <returns>возвращаем объект</returns>
-            public WorkerBase this[int i]
+            public WorkerExcelBase this[int i]
             {
                 get
                 {
                     try
                     {
-                        WorkerBase rez = null;
-                        lock (WrkL)
+                        WorkerExcelBase rez = null;
+                        lock (ExlL)
                         {
-                            rez = this.WrkL[i];
+                            rez = this.ExlL[i];
                         }
 
                         if (rez == null) throw new ApplicationException(String.Format("Объект с индексом {0} не найден.", i));
@@ -402,12 +402,14 @@ namespace WordDotx.Lib
             public IEnumerator GetEnumerator()
             {
                 IEnumerator rez = null;
-                lock (WrkL)
+                lock (ExlL)
                 {
-                    rez = this.WrkL.GetEnumerator();
+                    rez = this.ExlL.GetEnumerator();
                 }
                 return rez;
             }
         }
+
+
     }
 }

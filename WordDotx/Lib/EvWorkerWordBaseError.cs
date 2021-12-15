@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WordDotx
+namespace WordDotx.Lib
 {
     /// <summary>
     /// Аргументы события исключения Работника
     /// </summary>
-    public class EvWorkerError : EventArgs
+    public class EvWorkerWordBaseError : EventArgs
     {
         /// <summary>
         /// Работник который выполняет задание
         /// </summary>
-        public Worker Wrk { get; private set; }
+        public WorkerWordBase Wrk { get; private set; }
 
         /// <summary>
         /// Сообщение об ошибке
@@ -26,7 +26,7 @@ namespace WordDotx
         /// </summary>
         /// <param name="Wrk">Работник который выполняет задание</param>
         /// <param name="ErrorMessage">Сообщение об ошибке</param>
-        public EvWorkerError(Worker Wrk, string ErrorMessage)
+        public EvWorkerWordBaseError(WorkerWordBase Wrk, string ErrorMessage)
         {
             this.Wrk = Wrk;
             this.ErrorMessage = ErrorMessage;

@@ -9,13 +9,13 @@ namespace WordDotx
     /// <summary>
     /// Класс который представляет результат работы нашего задания
     /// </summary>
-    public class RezultTask : Lib.TaskWordBase.RezultTaskBase
+    public class RezultTaskExcel : Lib.TaskExcelBase.RezultTaskBase
     {
         /// <summary>
         /// Конструктор который позволяет при создании связать результат с заданием для того чтобы потом отслеживать его
         /// </summary>
         /// <param name="Tsk">Задание к которому нужно привязать создаваемый класс который будет иметь доступ к закрытым полям для прогресс бара</param>
-        public RezultTask(TaskWord Tsk) : base(Tsk)
+        public RezultTaskExcel(TaskExcel Tsk) : base(Tsk)
         {
 
         }

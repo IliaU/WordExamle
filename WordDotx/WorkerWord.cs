@@ -9,7 +9,7 @@ namespace WordDotx
     /// <summary>
     /// Базовый класс для заданий которые могут выполнять задания из очереди асинхронно
     /// </summary>
-    public class Worker : Lib.WorkerBase
+    public class WorkerWord : Lib.WorkerWordBase
     {
         /// <summary>
         /// Ссылка на задание по которому идёт расчёт результата
@@ -26,12 +26,12 @@ namespace WordDotx
         /// <summary>
         /// Событие исключения которое возникло в работнике и он не может продолжать обрабатывать документы
         /// </summary>
-        public event EventHandler<EvWorkerError> onEvWorkerError;
+        public event EventHandler<EvWorkerWordError> onEvWorkerError;
 
         /// <summary>
         /// Конструктор
         /// </summary>
-        public Worker()
+        public WorkerWord()
         {
             base.onEvWorkerBaseError += Worker_onEvWorkerBaseError;
         }
@@ -41,13 +41,13 @@ namespace WordDotx
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Worker_onEvWorkerBaseError(object sender, Lib.EvWorkerBaseError e)
+        private void Worker_onEvWorkerBaseError(object sender, Lib.EvWorkerWordBaseError e)
         {
             try
             {
                 if (this.onEvWorkerError != null)
                 {
-                    EvWorkerError ArgErrorW = new EvWorkerError(this, e.ErrorMessage);
+                    EvWorkerWordError ArgErrorW = new EvWorkerWordError(this, e.ErrorMessage);
                     this.onEvWorkerError.Invoke(this, ArgErrorW);
                 }
             }

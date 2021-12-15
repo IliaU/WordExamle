@@ -14,11 +14,11 @@ namespace WordDotx
         /// <summary>
         /// Если на основе задания был сделан результат то ссылка на этот результат присваивается в самом задании
         /// </summary>
-        public new RezultTask RezTsk
+        public new RezultTaskWord RezTsk
         {
             get
             {
-                return (RezultTask)base.RezTsk;
+                return (RezultTaskWord)base.RezTsk;
             }
         }
 
@@ -38,7 +38,7 @@ namespace WordDotx
         public BookmarkList BkmrkL { get; private set; }
 
         /// <summary>
-        /// Замена в папке назначения файла если уже ст таким именем файл существует
+        /// Замена в папке назначения файла если уже с таким именем файл существует
         /// </summary>
         public bool ? ReplaseFileTarget { get; private set; }
 

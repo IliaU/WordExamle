@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordExamle", "WordExamle\WordExamle.csproj", "{C6D7A928-2FD7-45B8-9D1C-5A43A163CE9F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordDotx", "WordDotx\WordDotx.csproj", "{7025FCDA-F9E6-4385-B9B4-A507DACB0697}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelExample", "ExcelExample\ExcelExample.csproj", "{B989CE30-18AC-4F41-9073-74F50117671E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{7025FCDA-F9E6-4385-B9B4-A507DACB0697}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7025FCDA-F9E6-4385-B9B4-A507DACB0697}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7025FCDA-F9E6-4385-B9B4-A507DACB0697}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B989CE30-18AC-4F41-9073-74F50117671E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B989CE30-18AC-4F41-9073-74F50117671E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B989CE30-18AC-4F41-9073-74F50117671E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B989CE30-18AC-4F41-9073-74F50117671E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF3B993C-18AF-4A3E-8B25-7C1BBE71FFE7}
 	EndGlobalSection
 EndGlobal

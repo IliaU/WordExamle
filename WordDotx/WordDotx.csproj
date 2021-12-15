@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Office.Interop.Word.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Word.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -48,29 +52,43 @@
     <Compile Include="Bookmarks.cs" />
     <Compile Include="EnStatusTask.cs" />
     <Compile Include="EnStatusWorkercs.cs" />
+    <Compile Include="EvTaskExcelEnd.cs" />
+    <Compile Include="EvTaskExcelError.cs" />
+    <Compile Include="EvTaskExcelStart.cs" />
     <Compile Include="EvTaskWordEnd.cs" />
     <Compile Include="EvTaskWordError.cs" />
     <Compile Include="EvTaskWordStart.cs" />
-    <Compile Include="EvWorkerError.cs" />
-    <Compile Include="EvWorkerListError.cs" />
+    <Compile Include="EvWorkerExcelError.cs" />
+    <Compile Include="EvWorkerExcelListError.cs" />
+    <Compile Include="EvWorkerWordError.cs" />
+    <Compile Include="EvWorkerWordListError.cs" />
+    <Compile Include="ExcelServer.cs" />
+    <Compile Include="FarmExcel.cs" />
     <Compile Include="FarmWordDotx.cs" />
     <Compile Include="Lib\BookmarkBase.cs" />
-    <Compile Include="Lib\EvWorkerBaseError.cs" />
+    <Compile Include="Lib\EvWorkerExcelBaseError.cs" />
+    <Compile Include="Lib\EvWorkerWordBaseError.cs" />
     <Compile Include="Lib\TableBase.cs" />
+    <Compile Include="Lib\TaskExcelBase.cs" />
     <Compile Include="Lib\TaskWordBase.cs" />
     <Compile Include="Lib\TotalBase.cs" />
-    <Compile Include="Lib\WorkerBase.cs" />
+    <Compile Include="Lib\WorkerExcelBase.cs" />
+    <Compile Include="Lib\WorkerWordBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RezultTask.cs" />
+    <Compile Include="RezultTaskExcel.cs" />
+    <Compile Include="RezultTaskWord.cs" />
     <Compile Include="RezultTaskAffectetdRow.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableList.cs" />
+    <Compile Include="TaskExcel.cs" />
     <Compile Include="TaskWord.cs" />
     <Compile Include="Total.cs" />
     <Compile Include="TotalList.cs" />
     <Compile Include="WordDotxServer.cs" />
-    <Compile Include="Worker.cs" />
-    <Compile Include="WorkerList.cs" />
+    <Compile Include="WorkerExcel.cs" />
+    <Compile Include="WorkerExcelList.cs" />
+    <Compile Include="WorkerWord.cs" />
+    <Compile Include="WorkerWordList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

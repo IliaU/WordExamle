@@ -9,12 +9,12 @@ namespace WordDotx.Lib
     /// <summary>
     /// Аргументы события исключения Работника
     /// </summary>
-    public class EvWorkerBaseError : EventArgs
+    public class EvWorkerExcelBaseError : EventArgs
     {
         /// <summary>
         /// Работник который выполняет задание
         /// </summary>
-        public WorkerBase Wrk { get; private set; }
+        public WorkerExcelBase Exl { get; private set; }
 
         /// <summary>
         /// Сообщение об ошибке
@@ -24,11 +24,11 @@ namespace WordDotx.Lib
         /// <summary>
         /// Конструктор
         /// </summary>
-        /// <param name="Wrk">Работник который выполняет задание</param>
+        /// <param name="Exl">Работник который выполняет задание</param>
         /// <param name="ErrorMessage">Сообщение об ошибке</param>
-        public EvWorkerBaseError(WorkerBase Wrk, string ErrorMessage)
+        public EvWorkerExcelBaseError(WorkerExcelBase Exl, string ErrorMessage)
         {
-            this.Wrk = Wrk;
+            this.Exl = Exl;
             this.ErrorMessage = ErrorMessage;
         }
     }

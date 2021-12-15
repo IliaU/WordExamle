@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace WordDotx
 {
     /// <summary>
-    /// Аргументы события исключения пула
+    /// Аргументы события исключения Работника
     /// </summary>
-    public class EvWorkerListError : EventArgs
+    public class EvWorkerExcelError : EventArgs
     {
         /// <summary>
-        /// Пул который выполняет задание
+        /// Работник который выполняет задание
         /// </summary>
-        public WorkerList WrkList { get; private set; }
+        public WorkerExcel Exl { get; private set; }
 
         /// <summary>
         /// Сообщение об ошибке
@@ -24,11 +24,11 @@ namespace WordDotx
         /// <summary>
         /// Конструктор
         /// </summary>
-        /// <param name="WrkList">Пул который выполняет задание</param>
+        /// <param name="Exl">Работник который выполняет задание</param>
         /// <param name="ErrorMessage">Сообщение об ошибке</param>
-        public EvWorkerListError(WorkerList WrkList, string ErrorMessage)
+        public EvWorkerExcelError(WorkerExcel Exl, string ErrorMessage)
         {
-            this.WrkList = WrkList;
+            this.Exl = Exl;
             this.ErrorMessage = ErrorMessage;
         }
     }
