@@ -32,6 +32,10 @@ namespace WordDotx
         /// </summary>
         Running,
         /// <summary>
+        /// Вызвано обновление дангных в документе
+        /// </summary>
+        Refresh,
+        /// <summary>
         /// Задание выполнено и в процессе сохранения на диск
         /// </summary>
         Save,

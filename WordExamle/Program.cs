@@ -41,8 +41,8 @@ namespace WordExamle
                 nrow["A"] = "A3";
                 nrow["B"] = "B3";
                 nrow["C"] = "C3";
-                // Добавлем эту таблицу в наш класс
                 TabTmp.Rows.Add(nrow);
+                // Добавлем эту таблицу в наш класс
                 Table Tab = new Table("Tab", TabTmp);
                 TabL.Add(Tab, true);
 
