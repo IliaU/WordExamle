@@ -145,9 +145,12 @@ namespace WordDotx
                     //Отключить отображение окон с сообщениями
                     exelApp.DisplayAlerts = false;
 
-                    Excel.Workbook document = exelApp.Workbooks.Open(templatePathObj.ToString(), 0, false, 5, "", "", false, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "", true, false, 0, true, false, false);
+                    object NullValue = System.Reflection.Missing.Value;
+                    //Excel.Workbook document = exelApp.Workbooks.Open(templatePathObj.ToString(), 0, false, 5, "", "", false, Excel.XlPlatform.xlWindows, "", true, false, 0, true, false, false);
+                    //Excel.Workbook document = exelApp.Workbooks.Open(templatePathObj.ToString();//, "", true, false, 0, true, false, false);
+                    //Excel.Workbook document = exelApp.Workbooks.Open(templatePathObj.ToString(), "", true, false, 0, true, false, false);
+                    Excel.Workbook document = exelApp.Workbooks.Open(templatePathObj.ToString(), NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue);
 
-         
 
                     try
                     {
@@ -183,6 +186,8 @@ namespace WordDotx
 
                         // Обновляем все источники данных
                         document.RefreshAll();
+
+                        //System.Threading.Thread.Sleep(8000);
 
                         // Сохраняем документ
                         exelApp.Application.ActiveWorkbook.SaveAs(pathToSaveObj.ToString(), Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
