@@ -297,6 +297,9 @@ namespace WordDotx
                             }
                         }
 
+                        // Обновляем все источники данных
+                        document.RefreshAll();
+
                         // Восстанавливаем начальную ширину
                         for (int i = 0; i < SheetCount; i++)
                         {
@@ -411,15 +414,9 @@ namespace WordDotx
                             try { sheettmp.Columns["CZ:CZ"].ColumnWidth = colWith[103]; } catch (Exception) { }
                         }
 
-                        
-
-
                         // выставляем флаг что задание завершено успешно
                         base.SetStatusTaskExcel(Tsk, EnStatusTask.Refresh);
-
-                        // Обновляем все источники данных
-                        document.RefreshAll();
-
+                        
                         //System.Threading.Thread.Sleep(8000);
 
                         // Сохраняем документ
