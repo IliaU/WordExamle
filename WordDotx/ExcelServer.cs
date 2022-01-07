@@ -190,8 +190,12 @@ namespace WordDotx
                             // Восстанавливаем начальную ширину
                             for (int i = 0; i < 100; i++)
                             {
-                                Excel.Range rtmp = sheet.get_Range(string.Format("A{0}", i + 1), string.Format("A{0}", i + 1));
-                                rtmp.ColumnWidth = colWith[i];
+                                try
+                                {
+                                    Excel.Range rtmp = sheet.get_Range(string.Format("A{0}", i + 1), string.Format("A{0}", i + 1));
+                                    rtmp.ColumnWidth = colWith[i];
+                                }
+                                catch (Exception){}
                             }
                         }
 
