@@ -160,14 +160,114 @@ namespace WordDotx
                         {
                             //Получаем лист который выбрал пользователь
                             Excel.Worksheet sheettmp = (Excel.Worksheet)exelApp.Worksheets.get_Item(i+1);
-
+                                                        
                             // Сохраняем текущую ширину
-                            dynamic[] colWith = new dynamic[100];
-                            for (int ic = 0; ic < 100; ic++)
-                            {
-                                Excel.Range rtmp = sheettmp.get_Range(string.Format("A{0}", ic + 1), string.Format("A{0}", ic + 1));
-                                colWith[ic] = rtmp.ColumnWidth;
-                            }
+                            dynamic[] colWith = new dynamic[104];
+                            colWith[0] = sheettmp.Columns["A:A"].ColumnWidth;
+                            colWith[1] = sheettmp.Columns["B:B"].ColumnWidth;
+                            colWith[2] = sheettmp.Columns["C:C"].ColumnWidth;
+                            colWith[3] = sheettmp.Columns["D:D"].ColumnWidth;
+                            colWith[4] = sheettmp.Columns["E:E"].ColumnWidth;
+                            colWith[5] = sheettmp.Columns["F:F"].ColumnWidth;
+                            colWith[6] = sheettmp.Columns["G:G"].ColumnWidth;
+                            colWith[7] = sheettmp.Columns["H:H"].ColumnWidth;
+                            colWith[8] = sheettmp.Columns["I:I"].ColumnWidth;
+                            colWith[9] = sheettmp.Columns["G:G"].ColumnWidth;
+                            colWith[10] = sheettmp.Columns["K:K"].ColumnWidth;
+                            colWith[11] = sheettmp.Columns["L:L"].ColumnWidth;
+                            colWith[12] = sheettmp.Columns["M:M"].ColumnWidth;
+                            colWith[13] = sheettmp.Columns["N:N"].ColumnWidth;
+                            colWith[14] = sheettmp.Columns["O:O"].ColumnWidth;
+                            colWith[15] = sheettmp.Columns["P:P"].ColumnWidth;
+                            colWith[16] = sheettmp.Columns["Q:Q"].ColumnWidth;
+                            colWith[17] = sheettmp.Columns["R:R"].ColumnWidth;
+                            colWith[18] = sheettmp.Columns["S:S"].ColumnWidth;
+                            colWith[19] = sheettmp.Columns["T:T"].ColumnWidth;
+                            colWith[20] = sheettmp.Columns["U:U"].ColumnWidth;
+                            colWith[21] = sheettmp.Columns["V:V"].ColumnWidth;
+                            colWith[22] = sheettmp.Columns["W:W"].ColumnWidth;
+                            colWith[23] = sheettmp.Columns["X:X"].ColumnWidth;
+                            colWith[24] = sheettmp.Columns["Y:Y"].ColumnWidth;
+                            colWith[25] = sheettmp.Columns["Z:Z"].ColumnWidth;
+                            colWith[26] = sheettmp.Columns["AA:AA"].ColumnWidth;
+                            colWith[27] = sheettmp.Columns["AB:AB"].ColumnWidth;
+                            colWith[28] = sheettmp.Columns["AC:AC"].ColumnWidth;
+                            colWith[29] = sheettmp.Columns["AD:AD"].ColumnWidth;
+                            colWith[30] = sheettmp.Columns["AE:AE"].ColumnWidth;
+                            colWith[31] = sheettmp.Columns["AF:AF"].ColumnWidth;
+                            colWith[32] = sheettmp.Columns["AG:AG"].ColumnWidth;
+                            colWith[33] = sheettmp.Columns["AH:AH"].ColumnWidth;
+                            colWith[34] = sheettmp.Columns["AI:AI"].ColumnWidth;
+                            colWith[35] = sheettmp.Columns["AG:AG"].ColumnWidth;
+                            colWith[36] = sheettmp.Columns["AK:AK"].ColumnWidth;
+                            colWith[37] = sheettmp.Columns["AL:AL"].ColumnWidth;
+                            colWith[38] = sheettmp.Columns["AM:AM"].ColumnWidth;
+                            colWith[39] = sheettmp.Columns["AN:AN"].ColumnWidth;
+                            colWith[40] = sheettmp.Columns["AO:AO"].ColumnWidth;
+                            colWith[41] = sheettmp.Columns["AP:AP"].ColumnWidth;
+                            colWith[42] = sheettmp.Columns["AQ:AQ"].ColumnWidth;
+                            colWith[43] = sheettmp.Columns["AR:AR"].ColumnWidth;
+                            colWith[44] = sheettmp.Columns["AS:AS"].ColumnWidth;
+                            colWith[45] = sheettmp.Columns["AT:AT"].ColumnWidth;
+                            colWith[46] = sheettmp.Columns["AU:AU"].ColumnWidth;
+                            colWith[47] = sheettmp.Columns["AV:AV"].ColumnWidth;
+                            colWith[48] = sheettmp.Columns["AW:AW"].ColumnWidth;
+                            colWith[49] = sheettmp.Columns["AX:AX"].ColumnWidth;
+                            colWith[50] = sheettmp.Columns["AY:AY"].ColumnWidth;
+                            colWith[51] = sheettmp.Columns["AZ:AZ"].ColumnWidth;
+                            colWith[52] = sheettmp.Columns["BA:BA"].ColumnWidth;
+                            colWith[53] = sheettmp.Columns["BB:BB"].ColumnWidth;
+                            colWith[54] = sheettmp.Columns["BC:BC"].ColumnWidth;
+                            colWith[55] = sheettmp.Columns["BD:BD"].ColumnWidth;
+                            colWith[56] = sheettmp.Columns["BE:BE"].ColumnWidth;
+                            colWith[57] = sheettmp.Columns["BF:BF"].ColumnWidth;
+                            colWith[58] = sheettmp.Columns["BG:BG"].ColumnWidth;
+                            colWith[59] = sheettmp.Columns["BH:BH"].ColumnWidth;
+                            colWith[60] = sheettmp.Columns["BI:BI"].ColumnWidth;
+                            colWith[61] = sheettmp.Columns["BG:BG"].ColumnWidth;
+                            colWith[62] = sheettmp.Columns["BK:BK"].ColumnWidth;
+                            colWith[63] = sheettmp.Columns["BL:BL"].ColumnWidth;
+                            colWith[64] = sheettmp.Columns["BM:BM"].ColumnWidth;
+                            colWith[65] = sheettmp.Columns["BN:BN"].ColumnWidth;
+                            colWith[66] = sheettmp.Columns["BO:BO"].ColumnWidth;
+                            colWith[67] = sheettmp.Columns["BP:BP"].ColumnWidth;
+                            colWith[68] = sheettmp.Columns["BQ:BQ"].ColumnWidth;
+                            colWith[69] = sheettmp.Columns["BR:BR"].ColumnWidth;
+                            colWith[70] = sheettmp.Columns["BS:BS"].ColumnWidth;
+                            colWith[71] = sheettmp.Columns["BT:BT"].ColumnWidth;
+                            colWith[72] = sheettmp.Columns["BU:BU"].ColumnWidth;
+                            colWith[73] = sheettmp.Columns["BV:BV"].ColumnWidth;
+                            colWith[74] = sheettmp.Columns["BW:BW"].ColumnWidth;
+                            colWith[75] = sheettmp.Columns["BX:BX"].ColumnWidth;
+                            colWith[76] = sheettmp.Columns["BY:BY"].ColumnWidth;
+                            colWith[77] = sheettmp.Columns["BZ:BZ"].ColumnWidth;
+                            colWith[78] = sheettmp.Columns["CA:CA"].ColumnWidth;
+                            colWith[79] = sheettmp.Columns["CB:CB"].ColumnWidth;
+                            colWith[80] = sheettmp.Columns["CC:CC"].ColumnWidth;
+                            colWith[81] = sheettmp.Columns["CD:CD"].ColumnWidth;
+                            colWith[82] = sheettmp.Columns["CE:CE"].ColumnWidth;
+                            colWith[83] = sheettmp.Columns["CF:CF"].ColumnWidth;
+                            colWith[84] = sheettmp.Columns["CG:CG"].ColumnWidth;
+                            colWith[85] = sheettmp.Columns["CH:CH"].ColumnWidth;
+                            colWith[86] = sheettmp.Columns["CI:CI"].ColumnWidth;
+                            colWith[87] = sheettmp.Columns["CG:CG"].ColumnWidth;
+                            colWith[88] = sheettmp.Columns["CK:CK"].ColumnWidth;
+                            colWith[89] = sheettmp.Columns["CL:CL"].ColumnWidth;
+                            colWith[90] = sheettmp.Columns["CM:CM"].ColumnWidth;
+                            colWith[91] = sheettmp.Columns["CN:CN"].ColumnWidth;
+                            colWith[92] = sheettmp.Columns["CO:CO"].ColumnWidth;
+                            colWith[93] = sheettmp.Columns["CP:CP"].ColumnWidth;
+                            colWith[94] = sheettmp.Columns["CQ:CQ"].ColumnWidth;
+                            colWith[95] = sheettmp.Columns["CR:CR"].ColumnWidth;
+                            colWith[96] = sheettmp.Columns["CS:CS"].ColumnWidth;
+                            colWith[97] = sheettmp.Columns["CT:CT"].ColumnWidth;
+                            colWith[98] = sheettmp.Columns["CU:CU"].ColumnWidth;
+                            colWith[99] = sheettmp.Columns["CV:CV"].ColumnWidth;
+                            colWith[100] = sheettmp.Columns["CW:CW"].ColumnWidth;
+                            colWith[101] = sheettmp.Columns["CX:CX"].ColumnWidth;
+                            colWith[102] = sheettmp.Columns["CY:CY"].ColumnWidth;
+                            colWith[103] = sheettmp.Columns["CZ:CZ"].ColumnWidth;
+
                             SheetCountL.Add(colWith);
                         }
 
@@ -204,17 +304,111 @@ namespace WordDotx
 
                             //Получаем лист который выбрал пользователь
                             Excel.Worksheet sheettmp = (Excel.Worksheet)exelApp.Worksheets.get_Item(i + 1);
-                                                       
 
-                            for (int ic = 0; ic < 100; ic++)
-                            {
-                                try
-                                {
-                                    Excel.Range rtmp = sheettmp.get_Range(string.Format("A{0}", ic + 1), string.Format("A{0}", ic + 1));
-                                    rtmp.ColumnWidth = colWith[ic];
-                                }
-                                catch (Exception) { }
-                            }
+                            try { sheettmp.Columns["A:A"].ColumnWidth = colWith[0]; } catch (Exception) { }
+                            try { sheettmp.Columns["B:B"].ColumnWidth = colWith[1]; } catch (Exception) { }
+                            try { sheettmp.Columns["C:C"].ColumnWidth = colWith[2]; } catch (Exception) { }
+                            try { sheettmp.Columns["D:D"].ColumnWidth = colWith[3]; } catch (Exception) { }
+                            try { sheettmp.Columns["E:E"].ColumnWidth = colWith[4]; } catch (Exception) { }
+                            try { sheettmp.Columns["F:F"].ColumnWidth = colWith[5]; } catch (Exception) { }
+                            try { sheettmp.Columns["G:G"].ColumnWidth = colWith[6]; } catch (Exception) { }
+                            try { sheettmp.Columns["H:H"].ColumnWidth = colWith[7]; } catch (Exception) { }
+                            try { sheettmp.Columns["I:I"].ColumnWidth = colWith[8]; } catch (Exception) { }
+                            try { sheettmp.Columns["G:G"].ColumnWidth = colWith[9]; } catch (Exception) { }
+                            try { sheettmp.Columns["K:K"].ColumnWidth = colWith[10]; } catch (Exception) { }
+                            try { sheettmp.Columns["L:L"].ColumnWidth = colWith[11]; } catch (Exception) { }
+                            try { sheettmp.Columns["M:M"].ColumnWidth = colWith[12]; } catch (Exception) { }
+                            try { sheettmp.Columns["N:N"].ColumnWidth = colWith[13]; } catch (Exception) { }
+                            try { sheettmp.Columns["O:O"].ColumnWidth = colWith[14]; } catch (Exception) { }
+                            try { sheettmp.Columns["P:P"].ColumnWidth = colWith[15]; } catch (Exception) { }
+                            try { sheettmp.Columns["Q:Q"].ColumnWidth = colWith[16]; } catch (Exception) { }
+                            try { sheettmp.Columns["R:R"].ColumnWidth = colWith[17]; } catch (Exception) { }
+                            try { sheettmp.Columns["S:S"].ColumnWidth = colWith[18]; } catch (Exception) { }
+                            try { sheettmp.Columns["T:T"].ColumnWidth = colWith[19]; } catch (Exception) { }
+                            try { sheettmp.Columns["U:U"].ColumnWidth = colWith[20]; } catch (Exception) { }
+                            try { sheettmp.Columns["V:V"].ColumnWidth = colWith[21]; } catch (Exception) { }
+                            try { sheettmp.Columns["W:W"].ColumnWidth = colWith[22]; } catch (Exception) { }
+                            try { sheettmp.Columns["X:X"].ColumnWidth = colWith[23]; } catch (Exception) { }
+                            try { sheettmp.Columns["Y:Y"].ColumnWidth = colWith[24]; } catch (Exception) { }
+                            try { sheettmp.Columns["Z:Z"].ColumnWidth = colWith[25]; } catch (Exception) { }
+                            try { sheettmp.Columns["AA:AA"].ColumnWidth = colWith[26]; } catch (Exception) { }
+                            try { sheettmp.Columns["AB:AB"].ColumnWidth = colWith[27]; } catch (Exception) { }
+                            try { sheettmp.Columns["AC:AC"].ColumnWidth = colWith[28]; } catch (Exception) { }
+                            try { sheettmp.Columns["AD:AD"].ColumnWidth = colWith[29]; } catch (Exception) { }
+                            try { sheettmp.Columns["AE:AE"].ColumnWidth = colWith[30]; } catch (Exception) { }
+                            try { sheettmp.Columns["AF:AF"].ColumnWidth = colWith[31]; } catch (Exception) { }
+                            try { sheettmp.Columns["AG:AG"].ColumnWidth = colWith[32]; } catch (Exception) { }
+                            try { sheettmp.Columns["AH:AH"].ColumnWidth = colWith[33]; } catch (Exception) { }
+                            try { sheettmp.Columns["AI:AI"].ColumnWidth = colWith[34]; } catch (Exception) { }
+                            try { sheettmp.Columns["AG:AG"].ColumnWidth = colWith[35]; } catch (Exception) { }
+                            try { sheettmp.Columns["AK:AK"].ColumnWidth = colWith[36]; } catch (Exception) { }
+                            try { sheettmp.Columns["AL:AL"].ColumnWidth = colWith[37]; } catch (Exception) { }
+                            try { sheettmp.Columns["AM:AM"].ColumnWidth = colWith[38]; } catch (Exception) { }
+                            try { sheettmp.Columns["AN:AN"].ColumnWidth = colWith[39]; } catch (Exception) { }
+                            try { sheettmp.Columns["AO:AO"].ColumnWidth = colWith[40]; } catch (Exception) { }
+                            try { sheettmp.Columns["AP:AP"].ColumnWidth = colWith[41]; } catch (Exception) { }
+                            try { sheettmp.Columns["AQ:AQ"].ColumnWidth = colWith[42]; } catch (Exception) { }
+                            try { sheettmp.Columns["AR:AR"].ColumnWidth = colWith[43]; } catch (Exception) { }
+                            try { sheettmp.Columns["AS:AS"].ColumnWidth = colWith[44]; } catch (Exception) { }
+                            try { sheettmp.Columns["AT:AT"].ColumnWidth = colWith[45]; } catch (Exception) { }
+                            try { sheettmp.Columns["AU:AU"].ColumnWidth = colWith[46]; } catch (Exception) { }
+                            try { sheettmp.Columns["AV:AV"].ColumnWidth = colWith[47]; } catch (Exception) { }
+                            try { sheettmp.Columns["AW:AW"].ColumnWidth = colWith[48]; } catch (Exception) { }
+                            try { sheettmp.Columns["AX:AX"].ColumnWidth = colWith[49]; } catch (Exception) { }
+                            try { sheettmp.Columns["AY:AY"].ColumnWidth = colWith[50]; } catch (Exception) { }
+                            try { sheettmp.Columns["AZ:AZ"].ColumnWidth = colWith[51]; } catch (Exception) { }
+                            try { sheettmp.Columns["BA:BA"].ColumnWidth = colWith[52]; } catch (Exception) { }
+                            try { sheettmp.Columns["BB:BB"].ColumnWidth = colWith[53]; } catch (Exception) { }
+                            try { sheettmp.Columns["BC:BC"].ColumnWidth = colWith[54]; } catch (Exception) { }
+                            try { sheettmp.Columns["BD:BD"].ColumnWidth = colWith[55]; } catch (Exception) { }
+                            try { sheettmp.Columns["BE:BE"].ColumnWidth = colWith[56]; } catch (Exception) { }
+                            try { sheettmp.Columns["BF:BF"].ColumnWidth = colWith[57]; } catch (Exception) { }
+                            try { sheettmp.Columns["BG:BG"].ColumnWidth = colWith[58]; } catch (Exception) { }
+                            try { sheettmp.Columns["BH:BH"].ColumnWidth = colWith[59]; } catch (Exception) { }
+                            try { sheettmp.Columns["BI:BI"].ColumnWidth = colWith[60]; } catch (Exception) { }
+                            try { sheettmp.Columns["BG:BG"].ColumnWidth = colWith[61]; } catch (Exception) { }
+                            try { sheettmp.Columns["BK:BK"].ColumnWidth = colWith[62]; } catch (Exception) { }
+                            try { sheettmp.Columns["BL:BL"].ColumnWidth = colWith[63]; } catch (Exception) { }
+                            try { sheettmp.Columns["BM:BM"].ColumnWidth = colWith[64]; } catch (Exception) { }
+                            try { sheettmp.Columns["BN:BN"].ColumnWidth = colWith[65]; } catch (Exception) { }
+                            try { sheettmp.Columns["BO:BO"].ColumnWidth = colWith[66]; } catch (Exception) { }
+                            try { sheettmp.Columns["BP:BP"].ColumnWidth = colWith[67]; } catch (Exception) { }
+                            try { sheettmp.Columns["BQ:BQ"].ColumnWidth = colWith[68]; } catch (Exception) { }
+                            try { sheettmp.Columns["BR:BR"].ColumnWidth = colWith[69]; } catch (Exception) { }
+                            try { sheettmp.Columns["BS:BS"].ColumnWidth = colWith[70]; } catch (Exception) { }
+                            try { sheettmp.Columns["BT:BT"].ColumnWidth = colWith[71]; } catch (Exception) { }
+                            try { sheettmp.Columns["BU:BU"].ColumnWidth = colWith[72]; } catch (Exception) { }
+                            try { sheettmp.Columns["BV:BV"].ColumnWidth = colWith[73]; } catch (Exception) { }
+                            try { sheettmp.Columns["BW:BW"].ColumnWidth = colWith[74]; } catch (Exception) { }
+                            try { sheettmp.Columns["BX:BX"].ColumnWidth = colWith[75]; } catch (Exception) { }
+                            try { sheettmp.Columns["BY:BY"].ColumnWidth = colWith[76]; } catch (Exception) { }
+                            try { sheettmp.Columns["BZ:BZ"].ColumnWidth = colWith[77]; } catch (Exception) { }
+                            try { sheettmp.Columns["CA:CA"].ColumnWidth = colWith[78]; } catch (Exception) { }
+                            try { sheettmp.Columns["CB:CB"].ColumnWidth = colWith[79]; } catch (Exception) { }
+                            try { sheettmp.Columns["CC:CC"].ColumnWidth = colWith[80]; } catch (Exception) { }
+                            try { sheettmp.Columns["CD:CD"].ColumnWidth = colWith[81]; } catch (Exception) { }
+                            try { sheettmp.Columns["CE:CE"].ColumnWidth = colWith[82]; } catch (Exception) { }
+                            try { sheettmp.Columns["CF:CF"].ColumnWidth = colWith[83]; } catch (Exception) { }
+                            try { sheettmp.Columns["CG:CG"].ColumnWidth = colWith[84]; } catch (Exception) { }
+                            try { sheettmp.Columns["CH:CH"].ColumnWidth = colWith[85]; } catch (Exception) { }
+                            try { sheettmp.Columns["CI:CI"].ColumnWidth = colWith[86]; } catch (Exception) { }
+                            try { sheettmp.Columns["CG:CG"].ColumnWidth = colWith[87]; } catch (Exception) { }
+                            try { sheettmp.Columns["CK:CK"].ColumnWidth = colWith[88]; } catch (Exception) { }
+                            try { sheettmp.Columns["CL:CL"].ColumnWidth = colWith[89]; } catch (Exception) { }
+                            try { sheettmp.Columns["CM:CM"].ColumnWidth = colWith[90]; } catch (Exception) { }
+                            try { sheettmp.Columns["CN:CN"].ColumnWidth = colWith[91]; } catch (Exception) { }
+                            try { sheettmp.Columns["CO:CO"].ColumnWidth = colWith[92]; } catch (Exception) { }
+                            try { sheettmp.Columns["CP:CP"].ColumnWidth = colWith[93]; } catch (Exception) { }
+                            try { sheettmp.Columns["CQ:CQ"].ColumnWidth = colWith[94]; } catch (Exception) { }
+                            try { sheettmp.Columns["CR:CR"].ColumnWidth = colWith[95]; } catch (Exception) { }
+                            try { sheettmp.Columns["CS:CS"].ColumnWidth = colWith[96]; } catch (Exception) { }
+                            try { sheettmp.Columns["CT:CT"].ColumnWidth = colWith[97]; } catch (Exception) { }
+                            try { sheettmp.Columns["CU:CU"].ColumnWidth = colWith[98]; } catch (Exception) { }
+                            try { sheettmp.Columns["CV:CV"].ColumnWidth = colWith[99]; } catch (Exception) { }
+                            try { sheettmp.Columns["CW:CW"].ColumnWidth = colWith[100]; } catch (Exception) { }
+                            try { sheettmp.Columns["CX:CX"].ColumnWidth = colWith[101]; } catch (Exception) { }
+                            try { sheettmp.Columns["CY:CY"].ColumnWidth = colWith[102]; } catch (Exception) { }
+                            try { sheettmp.Columns["CZ:CZ"].ColumnWidth = colWith[103]; } catch (Exception) { }
                         }
 
                         
