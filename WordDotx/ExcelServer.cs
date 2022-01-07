@@ -160,6 +160,14 @@ namespace WordDotx
                             //Получаем лист который выбрал пользователь
                             Excel.Worksheet sheet = (Excel.Worksheet)exelApp.Worksheets.get_Item(int.Parse(item.TableName.Split('|')[0]));
 
+                            // Сохраняем текущую ширину
+                            dynamic[] colWith = new dynamic[100];
+                            for (int i = 0; i < 100; i++)
+                            {
+                                Excel.Range rtmp = sheet.get_Range(string.Format("A{0}",i+1), string.Format("A{0}", i + 1));
+                                colWith[i] = rtmp.ColumnWidth;
+                            }
+
                             //Получаем ячейку самого левого угла в таблице
                             Excel.Range range = sheet.get_Range(item.TableName.Split('|')[1], item.TableName.Split('|')[1]);
 
@@ -177,6 +185,13 @@ namespace WordDotx
 
                                 // Обновляем статистику по таблице
                                 base.SetTableInExcelAffected(Tsk, iRow + 1);
+                            }
+
+                            // Восстанавливаем начальную ширину
+                            for (int i = 0; i < 100; i++)
+                            {
+                                Excel.Range rtmp = sheet.get_Range(string.Format("A{0}", i + 1), string.Format("A{0}", i + 1));
+                                rtmp.ColumnWidth = colWith[i];
                             }
                         }
 
