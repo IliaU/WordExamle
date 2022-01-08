@@ -300,6 +300,9 @@ namespace WordDotx
                         // Обновляем все источники данных
                         document.RefreshAll();
 
+                        // Пробуем дать паузу перед восстановлением ширины в колонках
+                        System.Threading.Thread.Sleep(10000);
+
                         // Восстанавливаем начальную ширину
                         for (int i = 0; i < SheetCount; i++)
                         {
@@ -417,8 +420,6 @@ namespace WordDotx
                         // выставляем флаг что задание завершено успешно
                         base.SetStatusTaskExcel(Tsk, EnStatusTask.Refresh);
                         
-                        //System.Threading.Thread.Sleep(8000);
-
                         // Сохраняем документ
                         exelApp.Application.ActiveWorkbook.SaveAs(pathToSaveObj.ToString(), Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                        
