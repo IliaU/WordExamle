@@ -76,6 +76,8 @@ namespace ExcelExample
                 SrvStatic = FarmExcel.CurrentExcelServer;
 
                 */
+
+                //ExcelServer.OlpenReport("Путь к файлу или если вызываем метод в екземпляре то можно передать задание");
             }
             catch (Exception ex)
             {

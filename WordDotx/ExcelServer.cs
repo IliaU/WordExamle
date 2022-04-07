@@ -466,7 +466,49 @@ namespace WordDotx
             }
         }
 
+        /// <summary>
+        /// Открыть файл Екселя
+        /// </summary>
+        /// <param name="Tsk">Задание в рамках которго хотим отткрыть файл</param>
+        public void OlpenReport(TaskExcel Tsk)
+        {
+            try
+            {
+                // Строим путь к файлу
+                string target = string.Format(@"{0}\{1}", this.DefaultPathTarget, Tsk.Target);
+                if (Tsk.Target.IndexOf(@"\") > 0) target = Tsk.Target;
 
+                OlpenReport(target);
+            }
+            catch (Exception ex)
+            {
+                // выставляем флаг что задание завершено c ошибкой
+                base.SetStatusMessage(Tsk, ex.Message);
+                base.SetStatusTaskExcel(Tsk, EnStatusTask.ERROR);
 
+                throw new ApplicationException(string.Format("{0}.OlpenReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
+            }
+        }
+        //
+        /// <summary>
+        /// Открыть файл Екселя
+        /// </summary>
+        /// <param name="fileexel">Путь к файлу</param>
+        static public void OlpenReport(string fileexel)
+        {
+            try
+            {
+                Excel.Application exelApp = new Excel.Application();
+                object NullValue = System.Reflection.Missing.Value;
+                
+                Excel.Workbook document = exelApp.Workbooks.Open(fileexel, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue, NullValue);
+                // Делаем видимыми все документы в этом приложении
+                exelApp.Application.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(string.Format("{0}.OlpenReport   Упали с ошибкой: ({1})", "ExcelServer", ex.Message));
+            }
+        }
     }
 }
