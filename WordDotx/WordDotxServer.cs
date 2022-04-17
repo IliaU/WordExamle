@@ -137,10 +137,12 @@ namespace WordDotx
                     // Проверка путей
                     if (templatePathObj == null || string.IsNullOrWhiteSpace(templatePathObj.ToString())) throw new ApplicationException(string.Format("Не указан файл шаблона"));
                     if (!File.Exists(templatePathObj.ToString())) throw new ApplicationException(string.Format("Шаблон не найден по пути: ({0})", templatePathObj.ToString()));
-                    if (pathToSaveObj == null || string.IsNullOrWhiteSpace(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("Не указан файл relf куда сохранить результат."));
-                    string DirTmp = Path.GetDirectoryName(pathToSaveObj.ToString());
-                    if (!Directory.Exists(DirTmp)) throw new ApplicationException(string.Format("Целевой директории в которой должен лежать файл не существует: ({0})", templatePathObj));
-                    if (!TmpReplaseFileTarget && File.Exists(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("В Целевой папке уже существует файл с таким именем: ({0})", pathToSaveObj.ToString()));
+                    if (pathToSaveObj != null)
+                    {
+                        string DirTmp = Path.GetDirectoryName(pathToSaveObj.ToString());
+                        if (!Directory.Exists(DirTmp)) throw new ApplicationException(string.Format("Целевой директории в которой должен лежать файл не существует: ({0})", templatePathObj));
+                        if (!TmpReplaseFileTarget && File.Exists(pathToSaveObj.ToString())) throw new ApplicationException(string.Format("В Целевой папке уже существует файл с таким именем: ({0})", pathToSaveObj.ToString()));
+                    }
 
                     // открываем приложение ворда
                     Word._Application application = new Word.Application();
