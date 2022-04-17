@@ -209,15 +209,18 @@ namespace WordDotx
                     {
                         try
                         {
-                            if (document != null)
+                            if (!application.Visible)
                             {
-                                document.Close();
-                                document = null;
-                            }
-                            if (application != null)
-                            {
-                                application.Quit();
-                                application = null;
+                                if (document != null)
+                                {
+                                    document.Close();
+                                    document = null;
+                                }
+                                if (application != null)
+                                {
+                                    application.Quit();
+                                    application = null;
+                                }
                             }
                         }
                         catch (Exception) { }

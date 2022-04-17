@@ -448,15 +448,18 @@ namespace WordDotx
                     {
                         try
                         {
-                            if (document != null)
+                            if (!exelApp.Visible)
                             {
-                                document.Close();
-                                document = null;
-                            }
-                            if (exelApp != null)
-                            {
-                                exelApp.Quit();
-                                exelApp = null;
+                                if (document != null)
+                                {
+                                    document.Close();
+                                    document = null;
+                                }
+                                if (exelApp != null)
+                                {
+                                    exelApp.Quit();
+                                    exelApp = null;
+                                }
                             }
                         }
                         catch (Exception) { }
