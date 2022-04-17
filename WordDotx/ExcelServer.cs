@@ -422,12 +422,18 @@ namespace WordDotx
                         
                         // Сохраняем документ
                         exelApp.Application.ActiveWorkbook.SaveAs(pathToSaveObj.ToString(), Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-                       
-                        // выставляем флаг что задание завершено успешно
-                        base.SetStatusTaskExcel(Tsk, EnStatusTask.Save);
 
-                        // Делаем видимыми все документы в этом приложении
-                        //application.Visible = true;
+                        // Если указан в качестве таргета хоть какой-то путь то сохраняем если нет то просто делаем видимым документ
+                        if (!string.IsNullOrWhiteSpace(Tsk.Target))
+                        {
+                            // выставляем флаг что задание завершено успешно
+                            base.SetStatusTaskExcel(Tsk, EnStatusTask.Save);
+                        }
+                        else
+                        {
+                            // Делаем видимыми все документы в этом приложении
+                            exelApp.Visible = true;
+                        }
 
                         // выставляем флаг что задание завершено успешно
                         base.SetStatusTaskExcel(Tsk, EnStatusTask.Success);

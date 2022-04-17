@@ -179,11 +179,17 @@ namespace WordDotx
                         // выставляем флаг что задание завершено успешно
                         base.SetStatusTaskWord(Tsk, EnStatusTask.Save);
 
-                        // Сохраняем но как вордовский докумен
-                        document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument);
-
-                        // Делаем видимыми все документы в этом приложении
-                        //application.Visible = true;
+                        // Если указан в качестве таргета хоть какой-то путь то сохраняем если нет то просто делаем видимым документ
+                        if (!string.IsNullOrWhiteSpace(Tsk.Target))
+                        {
+                            // Сохраняем но как вордовский докумен
+                            document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument);
+                        }
+                        else
+                        {
+                            // Делаем видимыми все документы в этом приложении
+                            application.Visible = true;
+                        }
 
                         // выставляем флаг что задание завершено успешно
                         base.SetStatusTaskWord(Tsk, EnStatusTask.Success);
@@ -226,7 +232,6 @@ namespace WordDotx
                 throw new ApplicationException(string.Format("{0}.StartCreateReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
             }
         }
-
 
         /// <summary>
         /// Обработка конкретной таблицы оказывается там может быть вложенность таблиц
@@ -450,5 +455,57 @@ namespace WordDotx
             }
         }
 
+        /// <summary>
+        /// Открыть файл Word
+        /// </summary>
+        /// <param name="Tsk">Задание в рамках которго хотим отткрыть файл</param>
+        public void OlpenReport(TaskWord Tsk)
+        {
+            try
+            {
+                // Строим путь к файлу
+                string target = string.Format(@"{0}\{1}", this.DefaultPathTarget, Tsk.Target);
+                if (Tsk.Target.IndexOf(@"\") > 0) target = Tsk.Target;
+
+                OlpenReport(target);
+            }
+            catch (Exception ex)
+            {
+                // выставляем флаг что задание завершено c ошибкой
+                base.SetStatusMessage(Tsk, ex.Message);
+                base.SetStatusTaskWord(Tsk, EnStatusTask.ERROR);
+
+                throw new ApplicationException(string.Format("{0}.OlpenReport   Упали с ошибкой: ({1})", obj.GetType().Name, ex.Message));
+            }
+        }
+        //
+        /// <summary>
+        /// Открыть файл Екселя
+        /// </summary>
+        /// <param name="fileexel">Путь к файлу</param>
+        static public void OlpenReport(string fileexel)
+        {
+            try
+            {
+                Word._Application application = new Word.Application();
+                Object missingObj = System.Reflection.Missing.Value;
+
+                Object templatePathObj = fileexel;
+
+                // Проверка путей
+                if (templatePathObj == null || string.IsNullOrWhiteSpace(templatePathObj.ToString())) throw new ApplicationException(string.Format("Не указан путь к файлу."));
+                if (!File.Exists(templatePathObj.ToString())) throw new ApplicationException(string.Format("Шаблон не найден по пути: ({0})", templatePathObj.ToString()));
+
+                // Добавляем в приложение сам документ  обрати внимание что может быть несколько документов добавлено а потом в самом концеможно из сделать видимыми
+                Word._Document document = application.Documents.Add(ref templatePathObj, ref missingObj, ref missingObj, ref missingObj);
+
+                // Делаем видимыми все документы в этом приложении
+                application.Visible = true;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(string.Format("{0}.OlpenReport   Упали с ошибкой: ({1})", "WordServer", ex.Message));
+            }
+        }
     }
 }
