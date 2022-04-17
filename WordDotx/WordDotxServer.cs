@@ -293,6 +293,7 @@ namespace WordDotx
                             }
 
                             // Поиск системных символов
+                            if (tmpCell.IndexOf("\a") == tmpCell.Length - 1) tmpCell = tmpCell.Substring(0, tmpCell.Length - 1);      // вконце ячейки встаёт системные символы их учитывать не надо
                             if (tmpCell.IndexOf("\r\r") == 0) tmpCell = tmpCell.Substring(2);                                        // вначале ячейки встаёт системные символы их учитывать не надо
                             if (tmpCell.IndexOf("\r\a") == tmpCell.Length - 2) tmpCell = tmpCell.Substring(0, tmpCell.Length - 2);   // вконце ячейки встаёт системные символы их учитывать не надо
                             tmpCell = tmpCell.Replace("\r", "");  // режем системные символы они нам тут не к чему
