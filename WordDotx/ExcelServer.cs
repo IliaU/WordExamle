@@ -112,7 +112,8 @@ namespace WordDotx
         /// Процесс создания отчёта с подменой в шаблоне необходимых элементов на наши закладки и таблицы
         /// </summary>
         /// <param name="Tsk">Задание которое нужно выполнить</param>
-        public void StartCreateReport(TaskExcel Tsk)
+        /// <param name="TimeoutSec">Тайм аут в секундах на выполнение обновления в источникиках по умолчанию 10 секунд</param>
+        public void StartCreateReport(TaskExcel Tsk, int TimeoutSec = 10)
         {
             try
             {
@@ -303,7 +304,7 @@ namespace WordDotx
                         document.RefreshAll();
 
                         // Пробуем дать паузу перед восстановлением ширины в колонках
-                        System.Threading.Thread.Sleep(10000);
+                        System.Threading.Thread.Sleep(TimeoutSec*1000);
 
                         // Восстанавливаем начальную ширину
                         for (int i = 0; i < SheetCount; i++)
@@ -421,15 +422,15 @@ namespace WordDotx
 
                         // выставляем флаг что задание завершено успешно
                         base.SetStatusTaskExcel(Tsk, EnStatusTask.Refresh);
-                        
-                        // Сохраняем документ
-                        exelApp.Application.ActiveWorkbook.SaveAs(pathToSaveObj.ToString(), Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange,Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-
+                                                
                         // Если указан в качестве таргета хоть какой-то путь то сохраняем если нет то просто делаем видимым документ
                         if (!string.IsNullOrWhiteSpace(Tsk.Target))
                         {
                             // выставляем флаг что задание завершено успешно
                             base.SetStatusTaskExcel(Tsk, EnStatusTask.Save);
+
+                            // Сохраняем документ
+                            exelApp.Application.ActiveWorkbook.SaveAs(pathToSaveObj.ToString(), Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
                         }
                         else
                         {

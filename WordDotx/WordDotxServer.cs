@@ -177,13 +177,13 @@ namespace WordDotx
                                 ProcessTable(Tsk, item, itemT, document);
                             }
                         }
-
-                        // выставляем флаг что задание завершено успешно
-                        base.SetStatusTaskWord(Tsk, EnStatusTask.Save);
-
+                        
                         // Если указан в качестве таргета хоть какой-то путь то сохраняем если нет то просто делаем видимым документ
                         if (!string.IsNullOrWhiteSpace(Tsk.Target))
                         {
+                            // выставляем флаг что задание завершено успешно
+                            base.SetStatusTaskWord(Tsk, EnStatusTask.Save);
+
                             // Сохраняем но как вордовский докумен
                             document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument);
                         }
